@@ -93,11 +93,11 @@ tbody tr:hover{background:var(--surface2)}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:320px;text-align:center;max-height:90vh;overflow-y:auto}
 .login-box h2{font-size:18px;font-weight:600;margin-bottom:6px}
 .login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
-.login-list{display:flex;flex-direction:column;gap:6px}
-.login-user{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;text-align:left;background:var(--surface);display:flex;align-items:center;gap:10px;font-size:13px;font-family:inherit}
-.login-user:hover{background:var(--accent-bg);border-color:var(--accent)}
-.role-tag{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:3px;background:var(--bg);color:var(--text3);font-weight:500}
-.is-admin .role-tag{background:var(--purple-bg);color:var(--purple)}
+.login-field{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:10px}
+.login-field:focus{outline:none;border-color:var(--accent)}
+.login-btn{width:100%;padding:10px;font-size:14px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit;margin-top:4px}
+.login-btn:hover{background:#1d4ed8}
+.login-err{color:var(--danger);font-size:12px;margin-top:8px;min-height:18px;text-align:center}
 .ini{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
 </style>
 </head>
@@ -106,8 +106,11 @@ tbody tr:hover{background:var(--surface2)}
   <div class="login-box">
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     <h2>Zeiterfassung</h2>
-    <p>Bitte Benutzer wählen</p>
-    <div class="login-list" id="login-list"><div style="color:var(--text3);font-size:13px;padding:12px">Lade…</div></div>
+    <p style="margin-bottom:20px">Bitte anmelden</p>
+    <input class="login-field" id="login-name" type="text" placeholder="Name" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
+    <input class="login-field" id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Anmelden</button>
+    <div class="login-err" id="login-err"></div>
   </div>
 </div>
 <div id="app" style="display:none">
@@ -151,28 +154,38 @@ function connectSSE(){
   sse.onerror=()=>setTimeout(connectSSE,5000);
 }
 
-async function loadUsers(){allUsers=await api.get('users');renderLoginList();}
+async function loadUsers(){allUsers=await api.get('users');}
 async function loadPending(){const a=await api.get('antraege');pending=a.filter(x=>x.status==='offen').length;renderSidebar();}
 
-function renderLoginList(){
-  document.getElementById('login-list').innerHTML=allUsers.map(u=>`
-    <button class="login-user${u.role==='admin'?' is-admin':''}" onclick="loginAs('${u.id}')">
-      <span class="ini" style="background:${u.role==='admin'?'var(--purple-bg)':'var(--accent-bg)'};color:${u.role==='admin'?'var(--purple)':'var(--accent-text)'}">${initials(u.name)}</span>
-      <span>${esc(u.name)}</span><span class="role-tag">${u.role==='admin'?'Admin':'Mitarbeiter'}</span>
-    </button>`).join('');
+async function doLogin(){
+  const name=document.getElementById('login-name').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const errEl=document.getElementById('login-err');
+  errEl.textContent='';
+  if(!name||!pw){errEl.textContent='Bitte Name und Passwort eingeben.';return;}
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,password:pw})});
+    const data=await r.json();
+    if(!r.ok){errEl.textContent=data.error||'Anmeldung fehlgeschlagen.';return;}
+    CU=data.user;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
+    document.getElementById('login-pw').value='';
+    page=CU.role==='admin'?'anwesenheit':'buchen';
+    adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
+    await loadPending();render();
+  }catch(e){errEl.textContent='Verbindungsfehler.';}
 }
 
-async function loginAs(id){
-  CU=allUsers.find(u=>u.id===id);if(!CU)return;
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
-  page=CU.role==='admin'?'anwesenheit':'buchen';
-  adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
-  await loadPending();render();
+function logout(){
+  CU=null;
+  document.getElementById('login-name').value='';
+  document.getElementById('login-pw').value='';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
 }
-
-function logout(){CU=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';}
 function nav(p){page=p;render();}
 
 function renderSidebar(){
@@ -389,27 +402,54 @@ async function entscheide(id,status){await api.patch(`antraege/${id}`,{status});
 async function pgMitarbeiter(){
   const mas=allUsers.filter(u=>u.role==='ma');
   return`<div class="page-hd"><h1>Mitarbeiter</h1></div>
-<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Soll (h/Monat)</th><th>Urlaub (Tage/Jahr)</th><th>Speichern</th></tr></thead>
-<tbody>${mas.map(u=>`<tr><td style="font-weight:500">${esc(u.name)}</td><td><input type="number" id="s-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.soll_stunden}"></td><td><input type="number" id="u-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td><td><button class="btn btn-sm" onclick="updateUser('${u.id}')">💾</button></td></tr>`).join('')}</tbody></table></div>
+<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Soll (h/Monat)</th><th>Urlaub (Tage/Jahr)</th><th>Passwort setzen</th><th>Speichern</th></tr></thead>
+<tbody>${mas.map(u=>`<tr>
+  <td style="font-weight:500">${esc(u.name)} ${u.has_password?'<span class="pill pill-ok" style="font-size:10px">🔒 gesetzt</span>':'<span class="pill pill-offen" style="font-size:10px">⚠ kein PW</span>'}</td>
+  <td><input type="number" id="s-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.soll_stunden}"></td>
+  <td><input type="number" id="u-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td>
+  <td><div style="display:flex;gap:5px;align-items:center"><input type="password" id="pw-${u.id}" class="tbl-inp" style="width:130px;border:1px solid var(--border2)" placeholder="Neues Passwort"><button class="btn btn-sm btn-primary" onclick="setPasswort('${u.id}','pw-${u.id}','pwmsg-${u.id}')">🔑 Setzen</button></div><div id="pwmsg-${u.id}" style="font-size:11px;margin-top:3px"></div></td>
+  <td><button class="btn btn-sm" onclick="updateUser('${u.id}')">💾</button></td>
+</tr>`).join('')}</tbody></table></div>
+<div class="sep"></div>
+<div class="card" style="border-left:3px solid var(--purple)"><div class="card-title">🔑 Admin-Passwort ändern</div>
+  <div class="form-row"><label class="form-lbl">Neues Passwort</label><input type="password" id="pw-admin" class="form-inp" placeholder="Neues Admin-Passwort"></div>
+  <button class="btn btn-primary" onclick="setPasswort('admin','pw-admin','pwmsg-admin')">🔑 Setzen</button>
+  <div id="pwmsg-admin" style="margin-top:8px"></div>
+</div>
 <div class="sep"></div>
 <div class="card"><div class="card-title">Neuen Mitarbeiter anlegen</div>
   <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="neu-name" class="form-inp" placeholder="Max Mustermann"></div>
   <div class="form-row"><label class="form-lbl">ID</label><input type="text" id="neu-id" class="form-inp" placeholder="ma6"></div>
   <div class="form-row"><label class="form-lbl">Soll (h/Monat)</label><input type="number" id="neu-soll" class="form-inp" value="160"></div>
   <div class="form-row"><label class="form-lbl">Urlaub (Tage)</label><input type="number" id="neu-urlaub" class="form-inp" value="20"></div>
+  <div class="form-row"><label class="form-lbl">Passwort</label><input type="password" id="neu-pw" class="form-inp" placeholder="Initiales Passwort (Pflicht)"></div>
   <button class="btn btn-primary" onclick="neuenMA()">+ Anlegen</button>
   <div id="ma-msg" style="margin-top:8px"></div>
 </div>`;
 }
 
 async function updateUser(id){const r=await api.patch(`users/${id}`,{soll_stunden:+document.getElementById('s-'+id).value,urlaub_anspruch:+document.getElementById('u-'+id).value});if(r.ok){await loadUsers();alert('Gespeichert.');}}
+
+async function setPasswort(userId, inputId, msgId){
+  const pw=document.getElementById(inputId).value;
+  const msgEl=document.getElementById(msgId);
+  if(!pw){msgEl.innerHTML='<span style="color:var(--danger)">Bitte Passwort eingeben.</span>';return;}
+  if(pw.length<4){msgEl.innerHTML='<span style="color:var(--danger)">Mindestens 4 Zeichen.</span>';return;}
+  const r=await api.patch(`users/${userId}`,{password:pw});
+  if(r.ok){document.getElementById(inputId).value='';msgEl.innerHTML='<span style="color:var(--success)">✓ Passwort gesetzt.</span>';await loadUsers();render();}
+  else msgEl.innerHTML=`<span style="color:var(--danger)">Fehler: ${r.error}</span>`;
+}
+
 async function neuenMA(){
-  const name=document.getElementById('neu-name').value.trim(),id=document.getElementById('neu-id').value.trim(),soll=+document.getElementById('neu-soll').value,urlaub=+document.getElementById('neu-urlaub').value;
+  const name=document.getElementById('neu-name').value.trim(),id=document.getElementById('neu-id').value.trim(),soll=+document.getElementById('neu-soll').value,urlaub=+document.getElementById('neu-urlaub').value,pw=document.getElementById('neu-pw').value;
   const msg=document.getElementById('ma-msg');
   if(!name||!id){msg.innerHTML='<div class="alert alert-warn">Name und ID sind Pflicht.</div>';return;}
+  if(!pw||pw.length<4){msg.innerHTML='<div class="alert alert-warn">Passwort ist Pflicht (mind. 4 Zeichen).</div>';return;}
   const r=await api.post('users',{id,name,role:'ma',soll_stunden:soll,urlaub_anspruch:urlaub});
-  if(r.ok){await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+  if(r.ok){
+    await api.patch(`users/${id}`,{password:pw});
+    await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';
+  } else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
 }
 
 async function pgEinstellungen(){
@@ -453,7 +493,7 @@ function pgExport(){
 function exportCSV(){const mo=document.getElementById('exp-mo').value,ma=document.getElementById('exp-ma').value;window.open('/api/export/csv?monat='+mo+(ma?'&userId='+ma:''),'_blank');}
 
 connectSSE();
-loadUsers();
+loadUsers(); // lädt allUsers für Admin-Ansichten (ohne Passwort-Hashes)
 </script>
 </body>
 </html>
