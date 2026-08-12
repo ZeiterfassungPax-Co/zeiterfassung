@@ -102,6 +102,19 @@ tbody tr:hover{background:var(--surface2)}
 </style>
 </head>
 <body>
+<!-- Ersteinrichtung (nur wenn Admin noch kein Passwort hat) -->
+<div id="setup-screen" style="position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200">
+  <div class="login-box">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <h2>Ersteinrichtung</h2>
+    <p style="margin-bottom:20px">Bitte Admin-Passwort festlegen</p>
+    <input class="login-field" id="setup-pw" type="password" placeholder="Admin-Passwort" autocomplete="new-password" onkeydown="if(event.key==='Enter')document.getElementById('setup-pw2').focus()">
+    <input class="login-field" id="setup-pw2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetup()">
+    <button class="login-btn" style="background:var(--purple)" onclick="doSetup()">Passwort speichern</button>
+    <div class="login-err" id="setup-err"></div>
+  </div>
+</div>
+
 <div id="login-screen">
   <div class="login-box">
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -156,6 +169,34 @@ function connectSSE(){
 
 async function loadUsers(){allUsers=await api.get('users');}
 async function loadPending(){const a=await api.get('antraege');pending=a.filter(x=>x.status==='offen').length;renderSidebar();}
+
+async function checkSetup(){
+  const r=await api.get('setup/needed');
+  if(r.needed){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('setup-screen').style.display='flex';
+  }
+}
+
+async function doSetup(){
+  const pw=document.getElementById('setup-pw').value;
+  const pw2=document.getElementById('setup-pw2').value;
+  const errEl=document.getElementById('setup-err');
+  errEl.textContent='';
+  if(!pw||pw.length<4){errEl.textContent='Mindestens 4 Zeichen erforderlich.';return;}
+  if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';return;}
+  const r=await api.post('setup',{password:pw});
+  if(r.ok){
+    document.getElementById('setup-screen').style.display='none';
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('setup-pw').value='';
+    document.getElementById('setup-pw2').value='';
+    document.getElementById('login-name').value='Administrator';
+    document.getElementById('login-name').focus();
+  } else {
+    errEl.textContent=r.error||'Fehler beim Speichern.';
+  }
+}
 
 async function doLogin(){
   const name=document.getElementById('login-name').value.trim();
@@ -494,6 +535,7 @@ function exportCSV(){const mo=document.getElementById('exp-mo').value,ma=documen
 
 connectSSE();
 loadUsers(); // lädt allUsers für Admin-Ansichten (ohne Passwort-Hashes)
+checkSetup(); // prüft ob Admin-Passwort bereits gesetzt ist
 </script>
 </body>
 </html>
