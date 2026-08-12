@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeiterfassung</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;--border:#e2e4e7;--border2:#c8ccd2;--text:#1a1d23;--text2:#5a6070;--text3:#9aa0ac;--accent:#2563eb;--accent-bg:#eff4ff;--accent-text:#1d4ed8;--success:#16a34a;--success-bg:#f0fdf4;--success-border:#bbf7d0;--danger:#dc2626;--danger-bg:#fef2f2;--danger-border:#fecaca;--warn:#d97706;--warn-bg:#fffbeb;--warn-border:#fde68a;--purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;--radius:6px;--sidebar:200px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+#app{display:flex;flex-direction:column;height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:48px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:7px;color:var(--accent)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);padding:8px 0;overflow-y:auto;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:20px}
+.sb-section{padding:6px 14px 3px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.sb-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;color:var(--text2);text-align:left}
+.sb-btn:hover{background:var(--bg);color:var(--text)}
+.sb-btn.active{background:var(--accent-bg);color:var(--accent-text);font-weight:500}
+.badge{margin-left:auto;font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;border-radius:8px;font-weight:600}
+select,input[type=text],input[type=date],input[type=time],input[type=number]{padding:6px 8px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit}
+select:focus,input:focus{outline:none;border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn:hover{background:var(--bg)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#1d4ed8}
+.btn-sm{padding:3px 8px;font-size:12px}
+.btn-success{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.stat-grid{grid-template-columns:repeat(2,1fr)}.sidebar{width:160px}.sb-btn{font-size:12px;padding:6px 10px}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.stat-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.stat-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:6px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
+.stat-bar-fill.over{background:var(--danger)}
+.pos{color:var(--success)}.neg{color:var(--danger)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:7px 10px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+.pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.pill-krank{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+.pill-urlaub{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+.pill-offen{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.pill-nb{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+.alert-info{background:var(--accent-bg);color:var(--accent-text);border:1px solid #bfdbfe}
+.alert-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.alert-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.alert-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+.stamp-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.clock-display{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1}
+.clock-date{font-size:12px;color:var(--text3);margin-top:4px}
+.stamp-btns{display:flex;gap:8px;flex-wrap:wrap}
+.s-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;font-size:13px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit}
+.s-ein{background:#16a34a;color:#fff}.s-ein:hover{background:#15803d}
+.s-aus{background:#dc2626;color:#fff}.s-aus:hover{background:#b91c1c}
+.s-pause{background:#d97706;color:#fff}.s-pause:hover{background:#b45309}
+.s-weiter{background:var(--accent);color:#fff}.s-weiter:hover{background:#1d4ed8}
+.dot-s{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-green{background:#16a34a}.dot-red{background:#9ca3af}.dot-yellow{background:#d97706}
+.page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.page-hd h1{font-size:16px;font-weight:600}
+.sep{height:1px;background:var(--border);margin:16px 0}
+.form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.form-lbl{font-size:13px;color:var(--text2);min-width:100px}
+.form-inp{flex:1;max-width:300px}
+.tbl-inp{width:100%;padding:3px 6px;font-size:12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit}
+.tbl-inp:hover{border-color:var(--border)}.tbl-inp:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.ma-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ma-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
+.ma-chip.act{background:var(--accent);color:#fff;border-color:var(--accent)}
+.anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
+.anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.anw-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.anw-name{font-size:13px;font-weight:500}.anw-sub{font-size:11px;color:var(--text3)}
+.nb-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.nb-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
+@media(max-width:700px){.nb-grid{grid-template-columns:1fr 1fr}}
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:320px;text-align:center;max-height:90vh;overflow-y:auto}
+.login-box h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
+.login-list{display:flex;flex-direction:column;gap:6px}
+.login-user{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;text-align:left;background:var(--surface);display:flex;align-items:center;gap:10px;font-size:13px;font-family:inherit}
+.login-user:hover{background:var(--accent-bg);border-color:var(--accent)}
+.role-tag{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:3px;background:var(--bg);color:var(--text3);font-weight:500}
+.is-admin .role-tag{background:var(--purple-bg);color:var(--purple)}
+.ini{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="login-screen">
+  <div class="login-box">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <h2>Zeiterfassung</h2>
+    <p>Bitte Benutzer wählen</p>
+    <div class="login-list" id="login-list"><div style="color:var(--text3);font-size:13px;padding:12px">Lade…</div></div>
+  </div>
+</div>
+<div id="app" style="display:none">
+  <div class="topbar">
+    <div class="logo">⏱ Zeiterfassung</div>
+    <div class="topbar-right">
+      <span class="live-dot" title="Live"></span>
+      <span style="font-size:12px;color:var(--text3)" id="topbar-name"></span>
+      <button class="btn btn-sm" onclick="logout()">Abmelden</button>
+    </div>
+  </div>
+  <div class="body">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main" id="main"></div>
+  </div>
+</div>
+<script>
+const pad=n=>String(n).padStart(2,'0');
+const fmtT=d=>pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+const fmtD=d=>pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+const monat=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);};
+const monatName=mk=>{const[y,m]=mk.split('-');return['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'][+m-1]+' '+y;};
+const initials=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtH=h=>{if(h===null||h===undefined)return'—';const neg=h<0;h=Math.abs(h);const hi=Math.floor(h),mi=Math.round((h-hi)*60);return(neg?'-':'')+hi+'h '+pad(mi)+'m';};
+const api={
+  get:url=>fetch('/api/'+url).then(r=>r.json()),
+  post:(url,data)=>fetch('/api/'+url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  patch:(url,data)=>fetch('/api/'+url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  del:url=>fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
+};
+let CU=null,page='buchen',adminSelMa=null,allUsers=[],pending=0,clockInt=null,sse=null;
+
+function connectSSE(){
+  if(sse)sse.close();
+  sse=new EventSource('/api/events');
+  ['buchung','nachbuchung','loeschung'].forEach(e=>sse.addEventListener(e,()=>{if(['anwesenheit','buchen','journal'].includes(page))render();}));
+  ['antrag_neu','antrag_update'].forEach(e=>sse.addEventListener(e,()=>{loadPending();if(page==='antraege')render();}));
+  sse.addEventListener('user_update',()=>loadUsers().then(()=>render()));
+  sse.onerror=()=>setTimeout(connectSSE,5000);
+}
+
+async function loadUsers(){allUsers=await api.get('users');renderLoginList();}
+async function loadPending(){const a=await api.get('antraege');pending=a.filter(x=>x.status==='offen').length;renderSidebar();}
+
+function renderLoginList(){
+  document.getElementById('login-list').innerHTML=allUsers.map(u=>`
+    <button class="login-user${u.role==='admin'?' is-admin':''}" onclick="loginAs('${u.id}')">
+      <span class="ini" style="background:${u.role==='admin'?'var(--purple-bg)':'var(--accent-bg)'};color:${u.role==='admin'?'var(--purple)':'var(--accent-text)'}">${initials(u.name)}</span>
+      <span>${esc(u.name)}</span><span class="role-tag">${u.role==='admin'?'Admin':'Mitarbeiter'}</span>
+    </button>`).join('');
+}
+
+async function loginAs(id){
+  CU=allUsers.find(u=>u.id===id);if(!CU)return;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
+  page=CU.role==='admin'?'anwesenheit':'buchen';
+  adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
+  await loadPending();render();
+}
+
+function logout(){CU=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';}
+function nav(p){page=p;render();}
+
+function renderSidebar(){
+  const isAdmin=CU?.role==='admin',p=page;
+  const sb=id=>`class="sb-btn${p===id?' active':''}" onclick="nav('${id}')"`;
+  document.getElementById('sidebar').innerHTML=isAdmin?`
+    <div class="sb-section">Übersicht</div>
+    <button ${sb('anwesenheit')}>👥 Anwesenheit</button>
+    <button ${sb('journal')}>📋 Journal</button>
+    <div class="sb-section">Verwaltung</div>
+    <button ${sb('antraege')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
+    <button ${sb('mitarbeiter')}>👤 Mitarbeiter</button>
+    <button ${sb('einstellungen')}>⚙️ Einstellungen</button>
+    <div class="sb-section">Auswertung</div>
+    <button ${sb('export')}>📊 Export</button>
+  `:`
+    <div class="sb-section">Zeiterfassung</div>
+    <button ${sb('buchen')}>⏱️ Buchen</button>
+    <button ${sb('journal')}>📋 Mein Journal</button>
+    <div class="sb-section">Abwesenheiten</div>
+    <button ${sb('urlaub')}>🏖️ Urlaubsantrag</button>
+    <button ${sb('krank')}>🏥 Krankmeldung</button>
+  `;
+}
+
+async function render(){
+  renderSidebar();
+  const el=document.getElementById('main');
+  el.innerHTML='<div style="padding:20px;color:var(--text3)">Lade…</div>';
+  try{
+    const isAdmin=CU?.role==='admin';
+    if(isAdmin){
+      if(page==='anwesenheit')el.innerHTML=await pgAnwesenheit();
+      else if(page==='journal')el.innerHTML=await pgAdminJournal();
+      else if(page==='antraege')el.innerHTML=await pgAdminAntraege();
+      else if(page==='mitarbeiter')el.innerHTML=await pgMitarbeiter();
+      else if(page==='einstellungen')el.innerHTML=await pgEinstellungen();
+      else el.innerHTML=pgExport();
+    }else{
+      if(page==='buchen')el.innerHTML=await pgBuchen();
+      else if(page==='journal')el.innerHTML=await pgJournal();
+      else if(page==='urlaub')el.innerHTML=await pgUrlaub();
+      else el.innerHTML=pgKrank();
+    }
+  }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${e.message}</div>`;}
+  startClock();
+}
+
+function startClock(){
+  if(clockInt)clearInterval(clockInt);
+  const tick=()=>{const el=document.getElementById('live-clock');if(el)el.textContent=fmtT(new Date());};
+  tick();clockInt=setInterval(tick,1000);
+}
+
+async function pgBuchen(){
+  const mk=monat();
+  const[st,jd]=await Promise.all([api.get(`users/${CU.id}/status`),api.get(`journal/${CU.id}?monat=${mk}`)]);
+  const kn=jd.konten,tage=jd.tage,p=Math.min(100,Math.round(kn.istH/(kn.soll||1)*100));
+  return`<div class="page-hd"><h1>Buchen — ${fmtD(new Date())}</h1></div>
+<div class="stamp-panel">
+  <div><div class="clock-display" id="live-clock">${fmtT(new Date())}</div><div class="clock-date">${fmtD(new Date())}</div></div>
+  <div class="stamp-btns">
+    ${st.status==='aus'?`<button class="s-btn s-ein" onclick="buchen('kommen')">▶ Kommen</button>`:''}
+    ${st.status==='ein'&&!st.inPause?`<button class="s-btn s-pause" onclick="buchen('pause_start')">⏸ Pause</button>`:''}
+    ${st.inPause?`<button class="s-btn s-weiter" onclick="buchen('pause_ende')">▶ Weiter</button>`:''}
+    ${st.status==='ein'?`<button class="s-btn s-aus" onclick="buchen('gehen')">■ Gehen</button>`:''}
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500">
+    <span class="dot-s ${st.status==='ein'&&!st.inPause?'dot-green':st.inPause?'dot-yellow':'dot-red'}"></span>
+    ${st.status==='ein'&&!st.inPause?'Anwesend'+(st.seit?' seit '+st.seit:''):st.inPause?'Pause':'Nicht eingestempelt'}
+  </div>
+</div>
+<div class="stat-grid">
+  <div class="stat-card"><div class="stat-lbl">Istzeit (Monat)</div><div class="stat-val">${fmtH(kn.istH)}</div><div class="stat-bar"><div class="stat-bar-fill${p>100?' over':''}" style="width:${Math.min(p,100)}%"></div></div><div class="stat-sub">${p}% von ${kn.soll}h</div></div>
+  <div class="stat-card"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div><div class="stat-sub">${kn.saldo>=0?'Guthaben':'Fehlzeit'}</div></div>
+  <div class="stat-card"><div class="stat-lbl">Resturlaub</div><div class="stat-val">${kn.urlaubRest}</div><div class="stat-sub">von ${CU.urlaub_anspruch} Tagen</div></div>
+  <div class="stat-card"><div class="stat-lbl">Kranktage</div><div class="stat-val ${kn.krank>0?'neg':''}">${kn.krank}</div><div class="stat-sub">diesen Monat</div></div>
+</div>
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Letzte Buchungen</div>
+<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Netto</th><th>Typ</th></tr></thead>
+<tbody>${tage.slice(0,5).map(t=>`<tr><td>${t.date.split('-').reverse().join('.')}</td><td>${t.ein||'—'}</td><td>${t.aus||'—'}</td><td>${t.pauseMin?t.pauseMin+'min':'—'}</td><td>${t.netto!==null?fmtH(t.netto):'—'}</td><td><span class="pill ${t.typ==='krank'?'pill-krank':t.typ==='urlaub'?'pill-urlaub':'pill-ok'}">${t.typ==='krank'?'Krank':t.typ==='urlaub'?'Urlaub':'✓'}</span></td></tr>`).join('')||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:16px">Noch keine Buchungen</td></tr>'}</tbody></table></div>`;
+}
+
+async function buchen(typ){await api.post('buchen',{userId:CU.id,typ});render();}
+
+async function pgJournal(){
+  const mk=monat(),d=await api.get(`journal/${CU.id}?monat=${mk}`);
+  const{tage,konten:kn}=d;
+  return`<div class="page-hd"><h1>Mein Journal — ${monatName(mk)}</h1></div>
+<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+  <div class="stat-card" style="min-width:120px"><div class="stat-lbl">Istzeit</div><div class="stat-val" style="font-size:18px">${fmtH(kn.istH)}</div></div>
+  <div class="stat-card" style="min-width:120px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
+  <div class="stat-card" style="min-width:120px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
+</div>
+<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Tag</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Netto</th><th>Typ</th><th>Kommentar</th></tr></thead>
+<tbody>${tage.map(t=>{const dw=['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(t.date+'T12:00:00').getDay()];return`<tr><td>${t.date.split('-').reverse().join('.')}</td><td style="color:var(--text3)">${dw}</td><td>${t.ein||'—'}</td><td>${t.aus||'—'}</td><td>${t.pauseMin?t.pauseMin+'min':'—'}</td><td>${t.netto!==null?fmtH(t.netto):'—'}</td><td><span class="pill ${t.typ==='krank'?'pill-krank':t.typ==='urlaub'?'pill-urlaub':'pill-ok'}">${t.typ==='krank'?'Krank':t.typ==='urlaub'?'Urlaub':'✓'}</span></td><td><input class="tbl-inp" value="${esc(t.kommentar)}" placeholder="Kommentar…" onchange="saveKomm('${CU.id}','${t.date}',this.value)"></td></tr>`;}).join('')||'<tr><td colspan="8" style="color:var(--text3);text-align:center;padding:16px">Keine Einträge</td></tr>'}</tbody></table></div>`;
+}
+
+async function saveKomm(uid,date,val){await api.patch('buchungen/kommentar',{userId:uid,date,kommentar:val});}
+
+async function pgUrlaub(){
+  const[antraege,jd]=await Promise.all([api.get(`antraege?userId=${CU.id}`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
+  const kn=jd.konten;
+  return`<div class="page-hd"><h1>Urlaubsantrag</h1></div>
+<div class="alert alert-info">Resturlaub: <strong>${kn.urlaubRest} Tage</strong> von ${CU.urlaub_anspruch} Tagen.</div>
+<div class="card"><div class="card-title">Neuen Urlaubsantrag stellen</div>
+  <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="uv" class="form-inp" value="${today()}"></div>
+  <div class="form-row"><label class="form-lbl">Bis (inkl.)</label><input type="date" id="ub" class="form-inp" value="${today()}"></div>
+  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="uk" class="form-inp" placeholder="z.B. Sommerurlaub"></div>
+  <button class="btn btn-primary" onclick="urlaubStellen()">📤 Antrag einreichen</button>
+  <div id="urlaub-msg" style="margin-top:8px"></div>
+</div>
+${antraege.length?`<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Meine Anträge</div>
+<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Kommentar</th><th>Status</th></tr></thead>
+<tbody>${antraege.map(a=>`<tr><td>${a.von.split('-').reverse().join('.')}</td><td>${a.bis.split('-').reverse().join('.')}</td><td>${a.tage}</td><td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td><td><span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span></td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Noch keine Anträge.</p>'}`;
+}
+
+async function urlaubStellen(){
+  const von=document.getElementById('uv').value,bis=document.getElementById('ub').value,k=document.getElementById('uk').value;
+  const msg=document.getElementById('urlaub-msg');
+  if(!von||!bis){msg.innerHTML='<div class="alert alert-warn">Bitte Von und Bis ausfüllen.</div>';return;}
+  if(von>bis){msg.innerHTML='<div class="alert alert-warn">Von darf nicht nach Bis liegen.</div>';return;}
+  let tage=0;for(let d=new Date(von);d<=new Date(bis);d.setDate(d.getDate()+1)){const dw=d.getDay();if(dw&&dw<6)tage++;}
+  const r=await api.post('antraege',{userId:CU.id,von,bis,tage,kommentar:k});
+  if(r.ok){await loadPending();msg.innerHTML='<div class="alert alert-success">✓ Antrag eingereicht.</div>';setTimeout(()=>render(),1500);}
+  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+}
+
+function pgKrank(){return`<div class="page-hd"><h1>Krankmeldung</h1></div>
+<div class="alert alert-info">Trag deinen Kranktag hier ein.</div>
+<div class="card"><div class="card-title">Kranktag eintragen</div>
+  <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="kd" class="form-inp" value="${today()}"></div>
+  <div class="form-row"><label class="form-lbl">Bis (optional)</label><input type="date" id="kbd" class="form-inp"></div>
+  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kk" class="form-inp" placeholder="z.B. Erkältung"></div>
+  <button class="btn btn-primary" onclick="krankmelden()">🏥 Eintragen</button>
+  <div id="krank-msg" style="margin-top:8px"></div>
+</div>`;}
+
+async function krankmelden(){
+  const d=document.getElementById('kd').value,bis=document.getElementById('kbd').value||d,k=document.getElementById('kk').value;
+  const msg=document.getElementById('krank-msg');
+  if(!d){msg.innerHTML='<div class="alert alert-warn">Bitte Datum wählen.</div>';return;}
+  for(let cur=new Date(d);cur<=new Date(bis);cur.setDate(cur.getDate()+1))
+    await api.post('buchen',{userId:CU.id,typ:'krank',kommentar:k||'Krank'});
+  msg.innerHTML='<div class="alert alert-success">✓ Kranktag eingetragen.</div>';
+}
+
+async function pgAnwesenheit(){
+  const data=await api.get('anwesenheit');
+  return`<div class="page-hd"><h1>Anwesenheit — ${fmtD(new Date())}</h1>${pending>0?`<span class="pill pill-offen">${pending} offene Anträge</span>`:''}</div>
+<div class="anw-grid">${data.map(u=>{const c=u.status.status==='ein'&&!u.status.inPause?'#16a34a':u.status.inPause?'#d97706':'#9ca3af';const lbl=u.status.status==='ein'&&!u.status.inPause?'Anwesend'+(u.status.seit?' seit '+u.status.seit:''):u.status.inPause?'Pause':'Abwesend';return`<div class="anw-card"><div class="anw-dot" style="background:${c}"></div><div><div class="anw-name">${esc(u.name)}</div><div class="anw-sub">${lbl}</div></div></div>`;}).join('')}</div>
+<div class="sep"></div>
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Monatsübersicht — ${monatName(monat())}</div>
+<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Istzeit</th><th>Soll</th><th>Saldo</th><th>Krank</th><th>Urlaub</th></tr></thead>
+<tbody>${data.map(u=>{const kn=u.konten;return`<tr><td style="font-weight:500">${esc(u.name)}</td><td>${fmtH(kn.istH)}</td><td>${u.soll_stunden}h</td><td class="${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</td><td>${kn.krank}</td><td>${kn.urlaubGenommen}/${u.urlaub_anspruch}</td></tr>`;}).join('')}</tbody></table></div>
+<p style="font-size:12px;color:var(--text3);margin-top:8px">⟳ Echtzeit — aktualisiert sofort wenn jemand stempelt.</p>`;
+}
+
+async function pgAdminJournal(){
+  const mas=allUsers.filter(u=>u.role==='ma');if(!adminSelMa)adminSelMa=mas[0]?.id;
+  const mk=monat(),d=await api.get(`journal/${adminSelMa}?monat=${mk}`);
+  const{tage,konten:kn}=d,u=allUsers.find(x=>x.id===adminSelMa);
+  return`<div class="page-hd"><h1>Journal</h1></div>
+<div class="ma-chips">${mas.map(m=>`<div class="ma-chip${adminSelMa===m.id?' act':''}" onclick="adminSelMa='${m.id}';render()">${esc(m.name)}</div>`).join('')}</div>
+<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Istzeit</div><div class="stat-val" style="font-size:18px">${fmtH(kn.istH)}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Urlaubsrest</div><div class="stat-val" style="font-size:18px">${kn.urlaubRest}</div></div>
+</div>
+<div class="card" style="border-left:3px solid var(--warn)">
+  <div class="card-title">✏️ Vergessene Buchung nachtragen — ${esc(u?.name||'')}</div>
+  <div class="nb-grid">
+    <div><div class="nb-lbl">Datum</div><input type="date" id="nb-d" style="width:100%" value="${today()}"></div>
+    <div><div class="nb-lbl">Kommen</div><input type="time" id="nb-k" style="width:100%" value="08:00"></div>
+    <div><div class="nb-lbl">Gehen</div><input type="time" id="nb-g" style="width:100%" value="17:00"></div>
+    <div><div class="nb-lbl">Pause (min)</div><input type="number" id="nb-p" style="width:100%" value="45" min="0"></div>
+    <div><button class="btn btn-primary" onclick="adminNachbuchen()" style="height:34px">Eintragen</button></div>
+  </div>
+  <div style="margin-top:8px"><div class="nb-lbl">Kommentar</div><input type="text" id="nb-c" style="width:100%;max-width:400px" placeholder="z.B. Handy vergessen"></div>
+  <div id="nb-msg" style="margin-top:8px"></div>
+</div>
+<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Tag</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Netto</th><th>Typ</th><th>Kommentar</th><th></th></tr></thead>
+<tbody>${tage.map(t=>{const dw=['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(t.date+'T12:00:00').getDay()];return`<tr><td>${t.date.split('-').reverse().join('.')}</td><td style="color:var(--text3)">${dw}</td><td>${t.ein||'—'}</td><td>${t.aus||'—'}</td><td>${t.pauseMin?t.pauseMin+'min':'—'}</td><td>${t.netto!==null?fmtH(t.netto):'—'}</td><td><span class="pill ${t.typ==='krank'?'pill-krank':t.typ==='urlaub'?'pill-urlaub':t.nachbuchung?'pill-nb':'pill-ok'}">${t.typ==='krank'?'Krank':t.typ==='urlaub'?'Urlaub':t.nachbuchung?'NB':'✓'}</span></td><td><input class="tbl-inp" value="${esc(t.kommentar)}" placeholder="Kommentar…" onchange="saveKomm('${adminSelMa}','${t.date}',this.value)"></td><td><button class="btn btn-sm btn-danger" onclick="loeschTag('${adminSelMa}','${t.date}')">🗑</button></td></tr>`;}).join('')||'<tr><td colspan="9" style="color:var(--text3);text-align:center;padding:16px">Keine Buchungen</td></tr>'}</tbody></table></div>`;
+}
+
+async function adminNachbuchen(){
+  const d=document.getElementById('nb-d').value,k=document.getElementById('nb-k').value,g=document.getElementById('nb-g').value,p=document.getElementById('nb-p').value,c=document.getElementById('nb-c').value,msg=document.getElementById('nb-msg');
+  if(!d||!k||!g){msg.innerHTML='<div class="alert alert-warn">Datum, Kommen und Gehen sind Pflicht.</div>';return;}
+  if(k>=g){msg.innerHTML='<div class="alert alert-warn">Gehenzeit muss nach Kommenzeit liegen.</div>';return;}
+  const r=await api.post('nachbuchen',{userId:adminSelMa,datum:d,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c});
+  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Nachbuchung gespeichert.</div>';render();}
+  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+}
+
+async function loeschTag(uid,date){if(!confirm('Alle Buchungen für diesen Tag wirklich löschen?'))return;await api.del(`buchungen/${uid}/${date}`);render();}
+
+async function pgAdminAntraege(){
+  const alle=await api.get('antraege');
+  const offen=alle.filter(a=>a.status==='offen'),entsch=alle.filter(a=>a.status!=='offen');
+  return`<div class="page-hd"><h1>Antragswesen</h1></div>
+${offen.length?`<div class="alert alert-warn">⚠️ ${offen.length} offene${offen.length===1?' Antrag':' Anträge'}.</div>`:'<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Offen (${offen.length})</div>
+${offen.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Von</th><th>Bis</th><th>Tage</th><th>Kommentar</th><th>Aktion</th></tr></thead>
+<tbody>${offen.map(a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td>${a.von.split('-').reverse().join('.')}</td><td>${a.bis.split('-').reverse().join('.')}</td><td>${a.tage}</td><td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td><td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.id},'genehmigt')">✓ Genehmigen</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.id},'abgelehnt')">✕ Ablehnen</button></td></tr>`).join('')}</tbody></table></div>`:''}
+<div class="sep"></div>
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Entschieden</div>
+${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th></tr></thead>
+<tbody>${entsch.map(a=>`<tr><td>${esc(a.userName)}</td><td>${a.von.split('-').reverse().join('.')}</td><td>${a.bis.split('-').reverse().join('.')}</td><td>${a.tage}</td><td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td></tr>`).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
+}
+
+async function entscheide(id,status){await api.patch(`antraege/${id}`,{status});await loadPending();render();}
+
+async function pgMitarbeiter(){
+  const mas=allUsers.filter(u=>u.role==='ma');
+  return`<div class="page-hd"><h1>Mitarbeiter</h1></div>
+<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Soll (h/Monat)</th><th>Urlaub (Tage/Jahr)</th><th>Speichern</th></tr></thead>
+<tbody>${mas.map(u=>`<tr><td style="font-weight:500">${esc(u.name)}</td><td><input type="number" id="s-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.soll_stunden}"></td><td><input type="number" id="u-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td><td><button class="btn btn-sm" onclick="updateUser('${u.id}')">💾</button></td></tr>`).join('')}</tbody></table></div>
+<div class="sep"></div>
+<div class="card"><div class="card-title">Neuen Mitarbeiter anlegen</div>
+  <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="neu-name" class="form-inp" placeholder="Max Mustermann"></div>
+  <div class="form-row"><label class="form-lbl">ID</label><input type="text" id="neu-id" class="form-inp" placeholder="ma6"></div>
+  <div class="form-row"><label class="form-lbl">Soll (h/Monat)</label><input type="number" id="neu-soll" class="form-inp" value="160"></div>
+  <div class="form-row"><label class="form-lbl">Urlaub (Tage)</label><input type="number" id="neu-urlaub" class="form-inp" value="20"></div>
+  <button class="btn btn-primary" onclick="neuenMA()">+ Anlegen</button>
+  <div id="ma-msg" style="margin-top:8px"></div>
+</div>`;
+}
+
+async function updateUser(id){const r=await api.patch(`users/${id}`,{soll_stunden:+document.getElementById('s-'+id).value,urlaub_anspruch:+document.getElementById('u-'+id).value});if(r.ok){await loadUsers();alert('Gespeichert.');}}
+async function neuenMA(){
+  const name=document.getElementById('neu-name').value.trim(),id=document.getElementById('neu-id').value.trim(),soll=+document.getElementById('neu-soll').value,urlaub=+document.getElementById('neu-urlaub').value;
+  const msg=document.getElementById('ma-msg');
+  if(!name||!id){msg.innerHTML='<div class="alert alert-warn">Name und ID sind Pflicht.</div>';return;}
+  const r=await api.post('users',{id,name,role:'ma',soll_stunden:soll,urlaub_anspruch:urlaub});
+  if(r.ok){await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';}
+  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+}
+
+async function pgEinstellungen(){
+  const s=await api.get('settings');
+  const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
+  return`<div class="page-hd"><h1>Einstellungen</h1></div>
+<div class="card"><div class="card-title">⏸ Pausenregelungen</div>
+  <div class="form-row"><label class="form-lbl">Ab 6h Arbeitszeit</label><input type="number" id="p6" class="form-inp" value="${s.pause6h||30}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
+  <div class="form-row"><label class="form-lbl">Ab 9h Arbeitszeit</label><input type="number" id="p9" class="form-inp" value="${s.pause9h||45}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
+</div>
+<div class="card"><div class="card-title">🏢 Firma</div>
+  <div class="form-row"><label class="form-lbl">Firmenname</label><input type="text" id="firma" class="form-inp" value="${esc(s.firmaName||'')}"></div>
+</div>
+<button class="btn btn-primary" onclick="saveSettings()">💾 Speichern</button>
+<div id="set-msg" style="margin-top:8px"></div>
+<div class="sep"></div>
+<div class="card" style="border-left:3px solid var(--danger)"><div class="card-title">📅 Monatsabschluss</div>
+  <div class="alert alert-warn" style="margin-bottom:10px">⚠️ Immer erst Export erstellen!</div>
+  <div class="form-row"><label class="form-lbl">Monat</label><select id="abschl-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
+  <button class="btn btn-danger" onclick="monatsabschluss()">⚠️ Monatsabschluss</button>
+  <div id="abschl-msg" style="margin-top:8px"></div>
+</div>`;
+}
+
+async function saveSettings(){const r=await api.post('settings',{pause6h:document.getElementById('p6').value,pause9h:document.getElementById('p9').value,firmaName:document.getElementById('firma').value});document.getElementById('set-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';}
+async function monatsabschluss(){const mo=document.getElementById('abschl-mo').value;if(!confirm(`Monatsabschluss für ${monatName(mo)} wirklich durchführen?`))return;const r=await api.post('monatsabschluss',{monat:mo});document.getElementById('abschl-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Durchgeführt.</div>':'<div class="alert alert-danger">Fehler.</div>';}
+
+function pgExport(){
+  const mas=allUsers.filter(u=>u.role==='ma');
+  const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
+  return`<div class="page-hd"><h1>Export</h1></div>
+<div class="card"><div class="card-title">📊 Monatsbericht</div>
+  <div class="form-row"><label class="form-lbl">Monat</label><select id="exp-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
+  <div class="form-row"><label class="form-lbl">Mitarbeiter</label><select id="exp-ma" class="form-inp" style="max-width:220px"><option value="">Alle</option>${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="exportCSV()">📄 Als CSV (Excel)</button>
+  </div>
+</div>`;
+}
+
+function exportCSV(){const mo=document.getElementById('exp-mo').value,ma=document.getElementById('exp-ma').value;window.open('/api/export/csv?monat='+mo+(ma?'&userId='+ma:''),'_blank');}
+
+connectSSE();
+loadUsers();
+</script>
+</body>
+</html>
