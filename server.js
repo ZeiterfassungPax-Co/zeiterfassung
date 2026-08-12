@@ -122,6 +122,22 @@ app.get('/api/events', (req,res) => {
   req.on('close',()=>{ clients.delete(res); clearInterval(ping); });
 });
 
+// ── ERSTEINRICHTUNG (nur wenn Admin noch kein Passwort hat) ───────────────────
+app.get('/api/setup/needed', (req,res) => {
+  const admin = DATA.users.find(u => u.id === 'admin');
+  res.json({ needed: !admin?.password_hash });
+});
+
+app.post('/api/setup', async (req, res) => {
+  const admin = DATA.users.find(u => u.id === 'admin');
+  if (admin?.password_hash) return res.status(403).json({ error: 'Setup bereits abgeschlossen.' });
+  const { password } = req.body;
+  if (!password || password.length < 4) return res.status(400).json({ error: 'Passwort muss mindestens 4 Zeichen haben.' });
+  admin.password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+  saveData();
+  res.json({ ok: true });
+});
+
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 app.post('/api/login', async (req, res) => {
   const { name, password } = req.body;
