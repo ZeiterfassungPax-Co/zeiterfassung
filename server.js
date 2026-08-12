@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SALT_ROUNDS = 10;
 
 const DB_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DB_DIR, 'zeiterfassung.json');
@@ -14,12 +16,12 @@ function loadData() {
   }
   return {
     users: [
-      { id:'ma1',  name:'Anna Müller',   role:'ma',    soll_stunden:160, urlaub_anspruch:20 },
-      { id:'ma2',  name:'Ben Schmidt',   role:'ma',    soll_stunden:160, urlaub_anspruch:20 },
-      { id:'ma3',  name:'Clara Weber',   role:'ma',    soll_stunden:80,  urlaub_anspruch:10 },
-      { id:'ma4',  name:'David Richter', role:'ma',    soll_stunden:160, urlaub_anspruch:20 },
-      { id:'ma5',  name:'Eva Bauer',     role:'ma',    soll_stunden:160, urlaub_anspruch:20 },
-      { id:'admin',name:'Administrator', role:'admin', soll_stunden:0,   urlaub_anspruch:0  },
+      { id:'ma1',  name:'Anna Müller',   role:'ma',    soll_stunden:160, urlaub_anspruch:20, password_hash:null },
+      { id:'ma2',  name:'Ben Schmidt',   role:'ma',    soll_stunden:160, urlaub_anspruch:20, password_hash:null },
+      { id:'ma3',  name:'Clara Weber',   role:'ma',    soll_stunden:80,  urlaub_anspruch:10, password_hash:null },
+      { id:'ma4',  name:'David Richter', role:'ma',    soll_stunden:160, urlaub_anspruch:20, password_hash:null },
+      { id:'ma5',  name:'Eva Bauer',     role:'ma',    soll_stunden:160, urlaub_anspruch:20, password_hash:null },
+      { id:'admin',name:'Administrator', role:'admin', soll_stunden:0,   urlaub_anspruch:0,  password_hash:null },
     ],
     buchungen: [], antraege: [],
     settings: { pause6h:'30', pause9h:'45', firmaName:'Mein Unternehmen' },
@@ -33,10 +35,19 @@ function saveData() {
 }
 
 let DATA = loadData();
+
+// Migrate existing users: ensure password_hash field exists
+DATA.users.forEach(u => { if (!('password_hash' in u)) u.password_hash = null; });
+saveData();
+
 let nextId = DATA.nextId || 1;
 function newId() { const id = nextId++; DATA.nextId = nextId; return id; }
 
 const pad = n => String(n).padStart(2, '0');
+
+function safeUser(u) {
+  return { id:u.id, name:u.name, role:u.role, soll_stunden:u.soll_stunden, urlaub_anspruch:u.urlaub_anspruch, has_password: !!u.password_hash };
+}
 
 function tagesauswertung(userId, monat) {
   const all = DATA.buchungen.filter(b => b.user_id === userId && b.ts.startsWith(monat));
@@ -98,6 +109,7 @@ function broadcast(event, data) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── SSE ──────────────────────────────────────────────────────────────────────
 app.get('/api/events', (req,res) => {
   res.setHeader('Content-Type','text/event-stream');
   res.setHeader('Cache-Control','no-cache');
@@ -110,12 +122,30 @@ app.get('/api/events', (req,res) => {
   req.on('close',()=>{ clients.delete(res); clearInterval(ping); });
 });
 
-app.get('/api/users', (req,res) => res.json(DATA.users.map(u=>({id:u.id,name:u.name,role:u.role,soll_stunden:u.soll_stunden,urlaub_anspruch:u.urlaub_anspruch}))));
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+app.post('/api/login', async (req, res) => {
+  const { name, password } = req.body;
+  if (!name || !password) return res.status(400).json({ error: 'Name und Passwort erforderlich' });
+
+  const user = DATA.users.find(u => u.name.toLowerCase() === name.trim().toLowerCase());
+  if (!user) return res.status(401).json({ error: 'Ungültiger Benutzername oder Passwort' });
+
+  if (!user.password_hash) return res.status(401).json({ error: 'Kein Passwort gesetzt. Bitte Admin kontaktieren.' });
+
+  const ok = await bcrypt.compare(password, user.password_hash);
+  if (!ok) return res.status(401).json({ error: 'Ungültiger Benutzername oder Passwort' });
+
+  res.json({ ok: true, user: safeUser(user) });
+});
+
+// ── USERS ─────────────────────────────────────────────────────────────────────
+// Gibt keine Passwort-Hashes zurück — nur sichere Felder
+app.get('/api/users', (req,res) => res.json(DATA.users.map(safeUser)));
 app.get('/api/users/:id/status', (req,res) => res.json(currentStatus(req.params.id)));
 
 app.get('/api/anwesenheit', (req,res) => {
   const mk = curMonat();
-  res.json(DATA.users.filter(u=>u.role==='ma').sort((a,b)=>a.name<b.name?-1:1).map(u=>({...u,status:currentStatus(u.id),konten:monatsKonten(u.id,mk)})));
+  res.json(DATA.users.filter(u=>u.role==='ma').sort((a,b)=>a.name<b.name?-1:1).map(u=>({...safeUser(u),status:currentStatus(u.id),konten:monatsKonten(u.id,mk)})));
 });
 
 app.get('/api/journal/:userId', (req,res) => {
@@ -123,6 +153,7 @@ app.get('/api/journal/:userId', (req,res) => {
   res.json({tage:tagesauswertung(req.params.userId,mk),konten:monatsKonten(req.params.userId,mk)});
 });
 
+// ── BUCHUNGEN ─────────────────────────────────────────────────────────────────
 app.post('/api/buchen', (req,res) => {
   const {userId,typ,kommentar} = req.body;
   if (!userId||!typ) return res.status(400).json({error:'Fehlt'});
@@ -161,6 +192,7 @@ app.delete('/api/buchungen/:userId/:date', (req,res) => {
   saveData(); broadcast('loeschung',{userId:req.params.userId,date:req.params.date}); res.json({ok:true});
 });
 
+// ── ANTRÄGE ───────────────────────────────────────────────────────────────────
 app.get('/api/antraege', (req,res) => {
   const alle=DATA.antraege.map(a=>({...a,userName:DATA.users.find(u=>u.id===a.user_id)?.name||'?'})).sort((a,b)=>a.ts<b.ts?1:-1);
   res.json(req.query.userId?alle.filter(a=>a.user_id===req.query.userId):alle);
@@ -181,27 +213,37 @@ app.patch('/api/antraege/:id', (req,res) => {
   saveData(); broadcast('antrag_update',{id:req.params.id,status}); res.json({ok:true});
 });
 
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
 app.get('/api/settings',(req,res)=>res.json(DATA.settings));
 app.post('/api/settings',(req,res)=>{ Object.assign(DATA.settings,req.body); saveData(); res.json({ok:true}); });
 
+// ── USERS CRUD ────────────────────────────────────────────────────────────────
 app.post('/api/users',(req,res)=>{
   if(DATA.users.find(u=>u.id===req.body.id)) return res.status(409).json({error:'ID bereits vorhanden'});
-  DATA.users.push({id:req.body.id,name:req.body.name,role:req.body.role||'ma',soll_stunden:req.body.soll_stunden||160,urlaub_anspruch:req.body.urlaub_anspruch||20});
+  DATA.users.push({id:req.body.id,name:req.body.name,role:req.body.role||'ma',soll_stunden:req.body.soll_stunden||160,urlaub_anspruch:req.body.urlaub_anspruch||20,password_hash:null});
   saveData(); broadcast('user_update',{}); res.json({ok:true});
 });
 
-app.patch('/api/users/:id',(req,res)=>{
+app.patch('/api/users/:id', async (req,res) => {
   const u=DATA.users.find(u=>u.id===req.params.id);
-  if(u){if(req.body.name)u.name=req.body.name;if(req.body.soll_stunden)u.soll_stunden=req.body.soll_stunden;if(req.body.urlaub_anspruch)u.urlaub_anspruch=req.body.urlaub_anspruch;}
+  if (!u) return res.status(404).json({error:'Nicht gefunden'});
+  if (req.body.name) u.name = req.body.name;
+  if (req.body.soll_stunden) u.soll_stunden = req.body.soll_stunden;
+  if (req.body.urlaub_anspruch) u.urlaub_anspruch = req.body.urlaub_anspruch;
+  if (req.body.password) {
+    u.password_hash = await bcrypt.hash(req.body.password, SALT_ROUNDS);
+  }
   saveData(); broadcast('user_update',{}); res.json({ok:true});
 });
 
+// ── MONATSABSCHLUSS ───────────────────────────────────────────────────────────
 app.post('/api/monatsabschluss',(req,res)=>{
   const {monat}=req.body; if(!monat) return res.status(400).json({error:'Monat fehlt'});
   DATA.buchungen=DATA.buchungen.filter(b=>!b.ts.startsWith(monat));
   saveData(); broadcast('monatsabschluss',{monat}); res.json({ok:true});
 });
 
+// ── EXPORT ────────────────────────────────────────────────────────────────────
 app.get('/api/export/csv',(req,res)=>{
   const mk=req.query.monat||curMonat();
   const users=req.query.userId?DATA.users.filter(u=>u.id===req.query.userId):DATA.users.filter(u=>u.role==='ma').sort((a,b)=>a.name<b.name?-1:1);
