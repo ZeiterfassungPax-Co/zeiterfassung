@@ -6,24 +6,41 @@
 <title>Zeiterfassung</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;--border:#e2e4e7;--border2:#c8ccd2;--text:#1a1d23;--text2:#5a6070;--text3:#9aa0ac;--accent:#2563eb;--accent-bg:#eff4ff;--accent-text:#1d4ed8;--success:#16a34a;--success-bg:#f0fdf4;--success-border:#bbf7d0;--danger:#dc2626;--danger-bg:#fef2f2;--danger-border:#fecaca;--warn:#d97706;--warn-bg:#fffbeb;--warn-border:#fde68a;--purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;--radius:6px;--sidebar:200px}
+:root{
+  --bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;
+  --border:#e2e4e7;--border2:#c8ccd2;
+  --text:#1a1d23;--text2:#5a6070;--text3:#9aa0ac;
+  --accent:#2563eb;--accent-bg:#eff4ff;--accent-text:#1d4ed8;
+  --success:#16a34a;--success-bg:#f0fdf4;--success-border:#bbf7d0;
+  --danger:#dc2626;--danger-bg:#fef2f2;--danger-border:#fecaca;
+  --warn:#d97706;--warn-bg:#fffbeb;--warn-border:#fde68a;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --radius:6px;--sidebar:210px
+}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
 #app{display:flex;flex-direction:column;height:100vh}
+
+/* ── Topbar ── */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:48px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:7px;color:var(--accent)}
+.logo{font-size:15px;font-weight:600;color:var(--accent)}
 .topbar-right{display:flex;align-items:center;gap:10px}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:pulse 2s infinite}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Layout ── */
 .body{display:flex;flex:1;overflow:hidden}
 .sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);padding:8px 0;overflow-y:auto;flex-shrink:0}
 .main{flex:1;overflow-y:auto;padding:20px}
-.sb-section{padding:6px 14px 3px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.sb-section{padding:6px 14px 3px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:6px}
 .sb-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 14px;font-size:13px;border:none;background:none;cursor:pointer;color:var(--text2);text-align:left}
 .sb-btn:hover{background:var(--bg);color:var(--text)}
 .sb-btn.active{background:var(--accent-bg);color:var(--accent-text);font-weight:500}
 .badge{margin-left:auto;font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;border-radius:8px;font-weight:600}
-select,input[type=text],input[type=date],input[type=time],input[type=number]{padding:6px 8px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit}
-select:focus,input:focus{outline:none;border-color:var(--accent)}
+
+/* ── Buttons & Inputs ── */
+input[type=text],input[type=password],input[type=date],input[type=time],input[type=number],select{padding:6px 8px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn:hover{background:var(--bg)}
 .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -31,37 +48,53 @@ select:focus,input:focus{outline:none;border-color:var(--accent)}
 .btn-sm{padding:3px 8px;font-size:12px}
 .btn-success{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
 .btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+.btn-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
+
+/* ── Cards ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
 .card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px}
+
+/* ── Stats ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-@media(max-width:600px){.stat-grid{grid-template-columns:repeat(2,1fr)}.sidebar{width:160px}.sb-btn{font-size:12px;padding:6px 10px}}
+@media(max-width:700px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
 .stat-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
 .stat-val{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
 .stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
-.stat-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:6px;overflow:hidden}
+.stat-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:6px}
 .stat-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
 .stat-bar-fill.over{background:var(--danger)}
 .pos{color:var(--success)}.neg{color:var(--danger)}
+
+/* ── Table ── */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:7px 10px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:2px solid var(--border);white-space:nowrap}
 td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
+.tbl-inp{width:100%;padding:3px 6px;font-size:12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit}
+.tbl-inp:hover{border-color:var(--border)}.tbl-inp:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+
+/* ── Pills ── */
 .pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
 .pill-ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
 .pill-krank{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
 .pill-urlaub{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
 .pill-offen{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.pill-fehler{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
 .pill-nb{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+
+/* ── Alerts ── */
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:12px}
 .alert-info{background:var(--accent-bg);color:var(--accent-text);border:1px solid #bfdbfe}
 .alert-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
 .alert-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
 .alert-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+
+/* ── Stempel ── */
 .stamp-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-.clock-display{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1}
+.clock-display{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px}
 .clock-date{font-size:12px;color:var(--text3);margin-top:4px}
 .stamp-btns{display:flex;gap:8px;flex-wrap:wrap}
 .s-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;font-size:13px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit}
@@ -69,66 +102,107 @@ tbody tr:hover{background:var(--surface2)}
 .s-aus{background:#dc2626;color:#fff}.s-aus:hover{background:#b91c1c}
 .s-pause{background:#d97706;color:#fff}.s-pause:hover{background:#b45309}
 .s-weiter{background:var(--accent);color:#fff}.s-weiter:hover{background:#1d4ed8}
-.dot-s{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-s{width:9px;height:9px;border-radius:50%;display:inline-block}
 .dot-green{background:#16a34a}.dot-red{background:#9ca3af}.dot-yellow{background:#d97706}
-.page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-.page-hd h1{font-size:16px;font-weight:600}
-.sep{height:1px;background:var(--border);margin:16px 0}
+
+/* ── Kalender ── */
+.cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.cal-nav h2{font-size:16px;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
+.cal-head{text-align:center;font-size:11px;font-weight:600;color:var(--text3);padding:4px 0}
+.cal-day{border:1px solid var(--border);border-radius:6px;padding:6px;min-height:72px;cursor:pointer;transition:box-shadow .15s;position:relative;background:var(--surface)}
+.cal-day:hover{box-shadow:0 0 0 2px var(--accent)}
+.cal-day.today{border-color:var(--accent);border-width:2px}
+.cal-day.empty{background:var(--bg);border-color:transparent;cursor:default;min-height:72px}
+.cal-day.empty:hover{box-shadow:none}
+.cal-dn{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text2)}
+.cal-day.today .cal-dn{color:var(--accent)}
+.cal-tag{font-size:10px;font-weight:600;padding:2px 5px;border-radius:4px;display:inline-block;margin-bottom:2px}
+.cal-tag-normal {background:var(--success-bg);color:var(--success)}
+.cal-tag-aktiv  {background:var(--accent-bg);color:var(--accent-text)}
+.cal-tag-krank  {background:var(--danger-bg);color:var(--danger)}
+.cal-tag-urlaub {background:var(--purple-bg);color:var(--purple)}
+.cal-tag-fehler {background:var(--orange-bg);color:var(--orange)}
+.cal-tag-frei   {background:var(--bg);color:var(--text3)}
+.cal-tag-offen  {background:var(--surface2);color:var(--text3)}
+.cal-time{font-size:10px;color:var(--text3);line-height:1.4}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text2);margin-bottom:12px}
+.cal-legend span{display:flex;align-items:center;gap:4px}
+.leg-dot{width:10px;height:10px;border-radius:3px}
+
+/* ── Modal ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border-radius:10px;padding:24px;width:420px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
 .form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.form-lbl{font-size:13px;color:var(--text2);min-width:100px}
-.form-inp{flex:1;max-width:300px}
-.tbl-inp{width:100%;padding:3px 6px;font-size:12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit}
-.tbl-inp:hover{border-color:var(--border)}.tbl-inp:focus{outline:none;border-color:var(--accent);background:var(--surface)}
-.ma-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.ma-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
-.ma-chip.act{background:var(--accent);color:#fff;border-color:var(--accent)}
-.anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
-.anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
-.anw-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.anw-name{font-size:13px;font-weight:500}.anw-sub{font-size:11px;color:var(--text3)}
-.nb-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.nb-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
-@media(max-width:700px){.nb-grid{grid-template-columns:1fr 1fr}}
-#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:320px;text-align:center;max-height:90vh;overflow-y:auto}
+.form-lbl{font-size:13px;color:var(--text2);min-width:110px}
+.form-inp{flex:1;max-width:260px}
+
+/* ── Login / Setup ── */
+.login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:340px;text-align:center}
 .login-box h2{font-size:18px;font-weight:600;margin-bottom:6px}
 .login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
 .login-field{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:10px}
 .login-field:focus{outline:none;border-color:var(--accent)}
 .login-btn{width:100%;padding:10px;font-size:14px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit;margin-top:4px}
 .login-btn:hover{background:#1d4ed8}
-.login-err{color:var(--danger);font-size:12px;margin-top:8px;min-height:18px;text-align:center}
-.ini{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.login-err{color:var(--danger);font-size:12px;margin-top:10px;min-height:18px;text-align:center}
+
+/* ── MA Chips ── */
+.ma-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ma-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
+.ma-chip.act{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── Anwesenheits-Grid ── */
+.anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
+.anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.anw-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.anw-name{font-size:13px;font-weight:500}.anw-sub{font-size:11px;color:var(--text3)}
+
+/* ── Page Header ── */
+.page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.page-hd h1{font-size:16px;font-weight:600}
+.sep{height:1px;background:var(--border);margin:16px 0}
+
+/* ── Checkboxen für Arbeitstage ── */
+.day-checks{display:flex;gap:8px;flex-wrap:wrap}
+.day-check{display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer}
 </style>
 </head>
 <body>
-<!-- Ersteinrichtung (nur wenn Admin noch kein Passwort hat) -->
-<div id="setup-screen" style="position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200">
+
+<!-- Setup-Screen (Ersteinrichtung) -->
+<div class="login-overlay" id="setup-screen" style="display:none">
   <div class="login-box">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     <h2>Ersteinrichtung</h2>
-    <p style="margin-bottom:20px">Bitte Admin-Passwort festlegen</p>
-    <input class="login-field" id="setup-pw" type="password" placeholder="Admin-Passwort" autocomplete="new-password" onkeydown="if(event.key==='Enter')document.getElementById('setup-pw2').focus()">
-    <input class="login-field" id="setup-pw2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetup()">
+    <p>Admin-Passwort festlegen</p>
+    <input class="login-field" id="setup-pw"  type="password" placeholder="Admin-Passwort" onkeydown="if(event.key==='Enter')document.getElementById('setup-pw2').focus()">
+    <input class="login-field" id="setup-pw2" type="password" placeholder="Passwort wiederholen" onkeydown="if(event.key==='Enter')doSetup()">
     <button class="login-btn" style="background:var(--purple)" onclick="doSetup()">Passwort speichern</button>
     <div class="login-err" id="setup-err"></div>
   </div>
 </div>
 
-<div id="login-screen">
+<!-- Login-Screen -->
+<div class="login-overlay" id="login-screen">
   <div class="login-box">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     <h2>Zeiterfassung</h2>
-    <p style="margin-bottom:20px">Bitte anmelden</p>
-    <input class="login-field" id="login-name" type="text" placeholder="Name" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
-    <input class="login-field" id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <p>Bitte anmelden</p>
+    <input class="login-field" id="login-user" type="text"     placeholder="Benutzername" autocomplete="username"         onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
+    <input class="login-field" id="login-pw"   type="password" placeholder="Passwort"     autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Anmelden</button>
     <div class="login-err" id="login-err"></div>
   </div>
 </div>
+
+<!-- Haupt-App -->
 <div id="app" style="display:none">
   <div class="topbar">
-    <div class="logo">⏱ Zeiterfassung</div>
+    <div class="logo">⏱ <span id="firma-name">Zeiterfassung</span></div>
     <div class="topbar-right">
       <span class="live-dot" title="Live"></span>
       <span style="font-size:12px;color:var(--text3)" id="topbar-name"></span>
@@ -137,39 +211,47 @@ tbody tr:hover{background:var(--surface2)}
   </div>
   <div class="body">
     <div class="sidebar" id="sidebar"></div>
-    <div class="main" id="main"></div>
+    <div class="main"    id="main"></div>
   </div>
 </div>
-<script>
-const pad=n=>String(n).padStart(2,'0');
-const fmtT=d=>pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-const fmtD=d=>pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
-const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
-const monat=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);};
-const monatName=mk=>{const[y,m]=mk.split('-');return['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'][+m-1]+' '+y;};
-const initials=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fmtH=h=>{if(h===null||h===undefined)return'—';const neg=h<0;h=Math.abs(h);const hi=Math.floor(h),mi=Math.round((h-hi)*60);return(neg?'-':'')+hi+'h '+pad(mi)+'m';};
-const api={
-  get:url=>fetch('/api/'+url).then(r=>r.json()),
-  post:(url,data)=>fetch('/api/'+url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  patch:(url,data)=>fetch('/api/'+url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  del:url=>fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
-};
-let CU=null,page='buchen',adminSelMa=null,allUsers=[],pending=0,clockInt=null,sse=null;
 
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const pad    = n => String(n).padStart(2,'0');
+const fmtT   = d => pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+const fmtD   = d => pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
+const today  = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+const monat  = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); };
+const monatName = mk => { const[y,m]=mk.split('-'); return ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][+m-1]+' '+y; };
+const esc    = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtH   = h => { if(h===null||h===undefined)return'—'; const neg=h<0; h=Math.abs(h); const hi=Math.floor(h),mi=Math.round((h-hi)*60); return(neg?'-':'')+hi+'h '+pad(mi)+'m'; };
+
+const api = {
+  get:   url           => fetch('/api/'+url).then(r=>r.json()),
+  post:  (url,data)    => fetch('/api/'+url,{method:'POST',  headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  patch: (url,data)    => fetch('/api/'+url,{method:'PATCH', headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  del:   url           => fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
+};
+
+let CU=null, page='kalender', allUsers=[], pending=0, clockInt=null, sse=null;
+let adminSelMa=null, calMonat=monat();
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
 function connectSSE(){
   if(sse)sse.close();
   sse=new EventSource('/api/events');
-  ['buchung','nachbuchung','loeschung'].forEach(e=>sse.addEventListener(e,()=>{if(['anwesenheit','buchen','journal'].includes(page))render();}));
-  ['antrag_neu','antrag_update'].forEach(e=>sse.addEventListener(e,()=>{loadPending();if(page==='antraege')render();}));
+  ['buchung','nachbuchung','loeschung'].forEach(e=>sse.addEventListener(e,()=>{ if(['kalender','buchen','anwesenheit'].includes(page))render(); }));
+  ['antrag_neu','antrag_update'].forEach(e=>sse.addEventListener(e,()=>{ loadPending(); if(['antraege','kalender'].includes(page))render(); }));
   sse.addEventListener('user_update',()=>loadUsers().then(()=>render()));
   sse.onerror=()=>setTimeout(connectSSE,5000);
 }
 
-async function loadUsers(){allUsers=await api.get('users');}
-async function loadPending(){const a=await api.get('antraege');pending=a.filter(x=>x.status==='offen').length;renderSidebar();}
-
+// ── Auth ──────────────────────────────────────────────────────────────────────
 async function checkSetup(){
   const r=await api.get('setup/needed');
   if(r.needed){
@@ -181,61 +263,64 @@ async function checkSetup(){
 async function doSetup(){
   const pw=document.getElementById('setup-pw').value;
   const pw2=document.getElementById('setup-pw2').value;
-  const errEl=document.getElementById('setup-err');
-  errEl.textContent='';
-  if(!pw||pw.length<4){errEl.textContent='Mindestens 4 Zeichen erforderlich.';return;}
-  if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';return;}
+  const err=document.getElementById('setup-err');
+  err.textContent='';
+  if(pw.length<4){err.textContent='Mind. 4 Zeichen erforderlich.';return;}
+  if(pw!==pw2){err.textContent='Passwörter stimmen nicht überein.';return;}
   const r=await api.post('setup',{password:pw});
   if(r.ok){
     document.getElementById('setup-screen').style.display='none';
     document.getElementById('login-screen').style.display='flex';
-    document.getElementById('setup-pw').value='';
-    document.getElementById('setup-pw2').value='';
-    document.getElementById('login-name').value='Administrator';
-    document.getElementById('login-name').focus();
-  } else {
-    errEl.textContent=r.error||'Fehler beim Speichern.';
-  }
+    document.getElementById('login-user').value='admin';
+    document.getElementById('login-pw').focus();
+  } else { err.textContent=r.error||'Fehler.'; }
 }
 
 async function doLogin(){
-  const name=document.getElementById('login-name').value.trim();
-  const pw=document.getElementById('login-pw').value;
-  const errEl=document.getElementById('login-err');
-  errEl.textContent='';
-  if(!name||!pw){errEl.textContent='Bitte Name und Passwort eingeben.';return;}
-  try{
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,password:pw})});
-    const data=await r.json();
-    if(!r.ok){errEl.textContent=data.error||'Anmeldung fehlgeschlagen.';return;}
-    CU=data.user;
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
-    document.getElementById('login-pw').value='';
-    page=CU.role==='admin'?'anwesenheit':'buchen';
-    adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
-    await loadPending();render();
-  }catch(e){errEl.textContent='Verbindungsfehler.';}
+  const username=document.getElementById('login-user').value.trim();
+  const password=document.getElementById('login-pw').value;
+  const err=document.getElementById('login-err');
+  err.textContent='';
+  if(!username||!password){err.textContent='Bitte Benutzername und Passwort eingeben.';return;}
+  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+  const data=await r.json();
+  if(!r.ok){err.textContent=data.error||'Anmeldung fehlgeschlagen.';return;}
+  CU=data.user;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
+  document.getElementById('login-pw').value='';
+  calMonat=monat();
+  page=CU.role==='admin'?'anwesenheit':'kalender';
+  adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
+  await loadPending();
+  const s=await api.get('settings');
+  document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';
+  render();
 }
 
 function logout(){
   CU=null;
-  document.getElementById('login-name').value='';
+  document.getElementById('login-user').value='';
   document.getElementById('login-pw').value='';
   document.getElementById('login-err').textContent='';
-  document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
 }
-function nav(p){page=p;render();}
 
+// ── Data Loading ──────────────────────────────────────────────────────────────
+async function loadUsers(){ allUsers=await api.get('users'); }
+async function loadPending(){ const a=await api.get('antraege'); pending=a.filter(x=>x.status==='offen').length; renderSidebar(); }
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 function renderSidebar(){
-  const isAdmin=CU?.role==='admin',p=page;
+  if(!CU)return;
+  const isAdmin=CU.role==='admin', p=page;
   const sb=id=>`class="sb-btn${p===id?' active':''}" onclick="nav('${id}')"`;
   document.getElementById('sidebar').innerHTML=isAdmin?`
     <div class="sb-section">Übersicht</div>
     <button ${sb('anwesenheit')}>👥 Anwesenheit</button>
-    <button ${sb('journal')}>📋 Journal</button>
+    <button ${sb('kalender')}>📅 Kalender</button>
     <div class="sb-section">Verwaltung</div>
     <button ${sb('antraege')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
     <button ${sb('mitarbeiter')}>👤 Mitarbeiter</button>
@@ -245,13 +330,19 @@ function renderSidebar(){
   `:`
     <div class="sb-section">Zeiterfassung</div>
     <button ${sb('buchen')}>⏱️ Buchen</button>
-    <button ${sb('journal')}>📋 Mein Journal</button>
+    <button ${sb('kalender')}>📅 Mein Kalender</button>
     <div class="sb-section">Abwesenheiten</div>
     <button ${sb('urlaub')}>🏖️ Urlaubsantrag</button>
     <button ${sb('krank')}>🏥 Krankmeldung</button>
+    <button ${sb('korrektur')}>✏️ Korrekturantrag</button>
+    <div class="sb-section">Anträge</div>
+    <button ${sb('meine-antraege')}>📋 Meine Anträge</button>
   `;
 }
 
+function nav(p){page=p;render();}
+
+// ── Render ────────────────────────────────────────────────────────────────────
 async function render(){
   renderSidebar();
   const el=document.getElementById('main');
@@ -259,32 +350,177 @@ async function render(){
   try{
     const isAdmin=CU?.role==='admin';
     if(isAdmin){
-      if(page==='anwesenheit')el.innerHTML=await pgAnwesenheit();
-      else if(page==='journal')el.innerHTML=await pgAdminJournal();
-      else if(page==='antraege')el.innerHTML=await pgAdminAntraege();
+      if(page==='anwesenheit')  el.innerHTML=await pgAnwesenheit();
+      else if(page==='kalender')el.innerHTML=await pgKalender(adminSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id, true);
+      else if(page==='antraege')el.innerHTML=await pgAntraege();
       else if(page==='mitarbeiter')el.innerHTML=await pgMitarbeiter();
       else if(page==='einstellungen')el.innerHTML=await pgEinstellungen();
       else el.innerHTML=pgExport();
-    }else{
-      if(page==='buchen')el.innerHTML=await pgBuchen();
-      else if(page==='journal')el.innerHTML=await pgJournal();
-      else if(page==='urlaub')el.innerHTML=await pgUrlaub();
-      else el.innerHTML=pgKrank();
+    } else {
+      if(page==='buchen')       el.innerHTML=await pgBuchen();
+      else if(page==='kalender')el.innerHTML=await pgKalender(CU.id, false);
+      else if(page==='urlaub')  el.innerHTML=await pgUrlaub();
+      else if(page==='krank')   el.innerHTML=pgKrank();
+      else if(page==='korrektur')el.innerHTML=pgKorrektur();
+      else if(page==='meine-antraege')el.innerHTML=await pgMeineAntraege();
     }
-  }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${e.message}</div>`;}
+  }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${esc(e.message)}</div>`;}
   startClock();
 }
 
 function startClock(){
   if(clockInt)clearInterval(clockInt);
   const tick=()=>{const el=document.getElementById('live-clock');if(el)el.textContent=fmtT(new Date());};
-  tick();clockInt=setInterval(tick,1000);
+  tick(); clockInt=setInterval(tick,1000);
 }
 
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(html){ document.getElementById('modal-content').innerHTML=html; document.getElementById('modal-bg').style.display='flex'; }
+function closeModal(){ document.getElementById('modal-bg').style.display='none'; }
+
+// ── Kalender-Typ-Konfiguration ────────────────────────────────────────────────
+const tagConfig = {
+  normal: {label:'Anwesend', cls:'cal-tag-normal'},
+  aktiv:  {label:'Aktiv',    cls:'cal-tag-aktiv'},
+  krank:  {label:'Krank',    cls:'cal-tag-krank'},
+  urlaub: {label:'Urlaub',   cls:'cal-tag-urlaub'},
+  fehler: {label:'⚠ Fehler', cls:'cal-tag-fehler'},
+  frei:   {label:'Frei',     cls:'cal-tag-frei'},
+  offen:  {label:'',         cls:'cal-tag-offen'},
+};
+
+// ── Kalender-Seite ────────────────────────────────────────────────────────────
+async function pgKalender(userId, isAdmin){
+  const selId = userId || CU.id;
+  const mas   = allUsers.filter(u=>u.role==='ma');
+  const d     = await api.get(`journal/${selId}?monat=${calMonat}`);
+  const {tage, konten:kn} = d;
+  const tageByDate = {};
+  tage.forEach(t=>tageByDate[t.date]=t);
+
+  const [year,mon] = calMonat.split('-').map(Number);
+  const firstDow   = (new Date(year,mon-1,1).getDay()+6)%7; // Mo=0
+  const daysInMon  = new Date(year,mon,0).getDate();
+  const todayStr   = today();
+  const user       = allUsers.find(u=>u.id===selId);
+
+  // Kalender-Zellen
+  let cells='';
+  for(let i=0;i<firstDow;i++) cells+=`<div class="cal-day empty"></div>`;
+  for(let day=1;day<=daysInMon;day++){
+    const ds  = `${calMonat}-${pad(day)}`;
+    const t   = tageByDate[ds];
+    const isT = ds===todayStr;
+    const cfg = t ? (tagConfig[t.typ]||tagConfig.offen) : tagConfig.offen;
+    const lbl = t ? cfg.label : '';
+    let info='';
+    if(t && t.typ==='normal'&&t.ein) info=`<div class="cal-time">${t.ein}–${t.aus||'?'}<br>${t.netto!==null?fmtH(t.netto):''}</div>`;
+    if(t && t.typ==='aktiv' &&t.ein) info=`<div class="cal-time">${t.ein}–laufend</div>`;
+    if(t && t.typ==='fehler')        info=`<div class="cal-time" style="color:var(--orange)">${esc(t.kommentar)}</div>`;
+    cells+=`<div class="cal-day${isT?' today':''}" onclick="calTagClick('${ds}','${selId}',${isAdmin})">
+      <div class="cal-dn">${day}</div>
+      ${lbl?`<span class="cal-tag ${cfg.cls}">${lbl}</span>`:''}
+      ${info}
+    </div>`;
+  }
+
+  const chipHtml = isAdmin ? `<div class="ma-chips">${mas.map(m=>`<div class="ma-chip${selId===m.id?' act':''}" onclick="adminSelMa='${m.id}';calMonat='${calMonat}';render()">${esc(m.name)}</div>`).join('')}</div>` : '';
+
+  const prevM = prevMonat(calMonat), nextM = nextMonat(calMonat);
+
+  return`
+<div class="page-hd">
+  <h1>📅 ${isAdmin?(user?esc(user.name):'Kalender'):'Mein Kalender'}</h1>
+</div>
+${chipHtml}
+<div class="cal-nav">
+  <button class="btn btn-sm" onclick="calMonat='${prevM}';render()">‹ ${monatName(prevM).split(' ')[0]}</button>
+  <h2>${monatName(calMonat)}</h2>
+  <button class="btn btn-sm" onclick="calMonat='${nextM}';render()">${monatName(nextM).split(' ')[0]} ›</button>
+  <button class="btn btn-sm" onclick="calMonat='${monat()}';render()">Heute</button>
+</div>
+<div class="cal-legend">
+  <span><span class="leg-dot" style="background:var(--success-bg);border:1px solid var(--success-border)"></span>Anwesend</span>
+  <span><span class="leg-dot" style="background:var(--purple-bg);border:1px solid var(--purple-border)"></span>Urlaub</span>
+  <span><span class="leg-dot" style="background:var(--danger-bg);border:1px solid var(--danger-border)"></span>Krank</span>
+  <span><span class="leg-dot" style="background:var(--orange-bg);border:1px solid var(--orange-border)"></span>Fehler</span>
+  <span><span class="leg-dot" style="background:var(--bg)"></span>Frei</span>
+</div>
+<div class="cal-grid">
+  <div class="cal-head">Mo</div><div class="cal-head">Di</div><div class="cal-head">Mi</div>
+  <div class="cal-head">Do</div><div class="cal-head">Fr</div><div class="cal-head">Sa</div><div class="cal-head">So</div>
+  ${cells}
+</div>
+<div class="sep"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Istzeit</div><div class="stat-val" style="font-size:18px">${fmtH(kn.istH)}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Übertrag</div><div class="stat-val" style="font-size:18px">${fmtH(kn.uebertragStunden)}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Fehler</div><div class="stat-val ${kn.fehler>0?'neg':''}" style="font-size:18px">${kn.fehler}</div></div>
+  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Resturlaub</div><div class="stat-val" style="font-size:18px">${kn.urlaubRest}</div></div>
+</div>`;
+}
+
+function prevMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m-2,1); return d.getFullYear()+'-'+pad(d.getMonth()+1); }
+function nextMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m,1);   return d.getFullYear()+'-'+pad(d.getMonth()+1); }
+
+// ── Kalender-Tag anklicken ────────────────────────────────────────────────────
+async function calTagClick(date, userId, isAdmin){
+  const d    = await api.get(`journal/${userId}?monat=${date.slice(0,7)}`);
+  const tag  = d.tage.find(t=>t.date===date);
+  const user = allUsers.find(u=>u.id===userId);
+  const ds   = date.split('-').reverse().join('.');
+  const typ  = tag?.typ||'offen';
+
+  if(!isAdmin){
+    // MA sieht nur Details, kein Bearbeiten
+    openModal(`<h3>📅 ${ds}</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px">
+        ${typ==='normal'?`Kommen: ${tag.ein} · Gehen: ${tag.aus} · Netto: ${fmtH(tag.netto)}`:
+          typ==='krank'?'🏥 Kranktag':typ==='urlaub'?'🏖️ Urlaub':
+          typ==='fehler'?'⚠️ '+esc(tag?.kommentar||'Fehler'):
+          typ==='aktiv'?'Eingestempelt seit '+tag.ein:'Kein Eintrag'}
+      </p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">Schließen</button></div>`);
+    return;
+  }
+
+  // Admin: Bearbeiten-Modal
+  openModal(`<h3>📅 ${ds} — ${esc(user?.name||'')}</h3>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
+      Aktuell: <strong>${typ==='normal'?`${tag.ein}–${tag.aus} (${fmtH(tag.netto)})`:typ==='fehler'?'⚠️ '+esc(tag.kommentar||'Fehler'):typ==='krank'?'Krank':typ==='urlaub'?'Urlaub':typ==='aktiv'?'Aktiv (eingestempelt)':'Kein Eintrag'}</strong>
+    </div>
+    <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="m-k" class="form-inp" value="${tag?.ein||'08:00'}"></div>
+    <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="m-g" class="form-inp" value="${tag?.aus||'17:00'}"></div>
+    <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="m-p" class="form-inp" value="${tag?.pauseMin||45}" min="0"></div>
+    <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="m-c" class="form-inp" value="${esc(tag?.kommentar||'')}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="adminLoeschTag('${userId}','${date}')">🗑 Löschen</button>
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="adminNachbuchen('${userId}','${date}')">💾 Speichern</button>
+    </div>`);
+}
+
+async function adminNachbuchen(userId,date){
+  const k=document.getElementById('m-k').value,g=document.getElementById('m-g').value,
+        p=document.getElementById('m-p').value,c=document.getElementById('m-c').value;
+  if(!k||!g){alert('Kommen und Gehen sind Pflicht.');return;}
+  const r=await api.post('nachbuchen',{userId,datum:date,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c||'Nachbuchung Admin'});
+  if(r.ok){closeModal();render();}else alert('Fehler: '+r.error);
+}
+
+async function adminLoeschTag(userId,date){
+  if(!confirm('Alle Buchungen für diesen Tag löschen?'))return;
+  await api.del(`buchungen/${userId}/${date}`);
+  closeModal(); render();
+}
+
+// ── Buchen ────────────────────────────────────────────────────────────────────
 async function pgBuchen(){
   const mk=monat();
   const[st,jd]=await Promise.all([api.get(`users/${CU.id}/status`),api.get(`journal/${CU.id}?monat=${mk}`)]);
-  const kn=jd.konten,tage=jd.tage,p=Math.min(100,Math.round(kn.istH/(kn.soll||1)*100));
+  const kn=jd.konten,p=Math.min(100,Math.round(kn.istH/(kn.soll||1)*100));
   return`<div class="page-hd"><h1>Buchen — ${fmtD(new Date())}</h1></div>
 <div class="stamp-panel">
   <div><div class="clock-display" id="live-clock">${fmtT(new Date())}</div><div class="clock-date">${fmtD(new Date())}</div></div>
@@ -304,44 +540,28 @@ async function pgBuchen(){
   <div class="stat-card"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div><div class="stat-sub">${kn.saldo>=0?'Guthaben':'Fehlzeit'}</div></div>
   <div class="stat-card"><div class="stat-lbl">Resturlaub</div><div class="stat-val">${kn.urlaubRest}</div><div class="stat-sub">von ${CU.urlaub_anspruch} Tagen</div></div>
   <div class="stat-card"><div class="stat-lbl">Kranktage</div><div class="stat-val ${kn.krank>0?'neg':''}">${kn.krank}</div><div class="stat-sub">diesen Monat</div></div>
-</div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Letzte Buchungen</div>
-<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Netto</th><th>Typ</th></tr></thead>
-<tbody>${tage.slice(0,5).map(t=>`<tr><td>${t.date.split('-').reverse().join('.')}</td><td>${t.ein||'—'}</td><td>${t.aus||'—'}</td><td>${t.pauseMin?t.pauseMin+'min':'—'}</td><td>${t.netto!==null?fmtH(t.netto):'—'}</td><td><span class="pill ${t.typ==='krank'?'pill-krank':t.typ==='urlaub'?'pill-urlaub':'pill-ok'}">${t.typ==='krank'?'Krank':t.typ==='urlaub'?'Urlaub':'✓'}</span></td></tr>`).join('')||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:16px">Noch keine Buchungen</td></tr>'}</tbody></table></div>`;
+</div>`;
 }
 
-async function buchen(typ){await api.post('buchen',{userId:CU.id,typ});render();}
+async function buchen(typ){ await api.post('buchen',{userId:CU.id,typ}); render(); }
 
-async function pgJournal(){
-  const mk=monat(),d=await api.get(`journal/${CU.id}?monat=${mk}`);
-  const{tage,konten:kn}=d;
-  return`<div class="page-hd"><h1>Mein Journal — ${monatName(mk)}</h1></div>
-<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-  <div class="stat-card" style="min-width:120px"><div class="stat-lbl">Istzeit</div><div class="stat-val" style="font-size:18px">${fmtH(kn.istH)}</div></div>
-  <div class="stat-card" style="min-width:120px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
-  <div class="stat-card" style="min-width:120px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
-</div>
-<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Tag</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Netto</th><th>Typ</th><th>Kommentar</th></tr></thead>
-<tbody>${tage.map(t=>{const dw=['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(t.date+'T12:00:00').getDay()];return`<tr><td>${t.date.split('-').reverse().join('.')}</td><td style="color:var(--text3)">${dw}</td><td>${t.ein||'—'}</td><td>${t.aus||'—'}</td><td>${t.pauseMin?t.pauseMin+'min':'—'}</td><td>${t.netto!==null?fmtH(t.netto):'—'}</td><td><span class="pill ${t.typ==='krank'?'pill-krank':t.typ==='urlaub'?'pill-urlaub':'pill-ok'}">${t.typ==='krank'?'Krank':t.typ==='urlaub'?'Urlaub':'✓'}</span></td><td><input class="tbl-inp" value="${esc(t.kommentar)}" placeholder="Kommentar…" onchange="saveKomm('${CU.id}','${t.date}',this.value)"></td></tr>`;}).join('')||'<tr><td colspan="8" style="color:var(--text3);text-align:center;padding:16px">Keine Einträge</td></tr>'}</tbody></table></div>`;
-}
-
-async function saveKomm(uid,date,val){await api.patch('buchungen/kommentar',{userId:uid,date,kommentar:val});}
-
+// ── Urlaubsantrag (MA) ────────────────────────────────────────────────────────
 async function pgUrlaub(){
-  const[antraege,jd]=await Promise.all([api.get(`antraege?userId=${CU.id}`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
+  const[antraege,jd]=await Promise.all([api.get(`antraege?userId=${CU.id}&typ=urlaub`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
   const kn=jd.konten;
   return`<div class="page-hd"><h1>Urlaubsantrag</h1></div>
-<div class="alert alert-info">Resturlaub: <strong>${kn.urlaubRest} Tage</strong> von ${CU.urlaub_anspruch} Tagen.</div>
-<div class="card"><div class="card-title">Neuen Urlaubsantrag stellen</div>
+<div class="alert alert-info">Resturlaub: <strong>${kn.urlaubRest} Tage</strong></div>
+<div class="card"><div class="card-title">Neuen Antrag stellen</div>
   <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="uv" class="form-inp" value="${today()}"></div>
   <div class="form-row"><label class="form-lbl">Bis (inkl.)</label><input type="date" id="ub" class="form-inp" value="${today()}"></div>
   <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="uk" class="form-inp" placeholder="z.B. Sommerurlaub"></div>
   <button class="btn btn-primary" onclick="urlaubStellen()">📤 Antrag einreichen</button>
   <div id="urlaub-msg" style="margin-top:8px"></div>
 </div>
-${antraege.length?`<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Meine Anträge</div>
-<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Kommentar</th><th>Status</th></tr></thead>
-<tbody>${antraege.map(a=>`<tr><td>${a.von.split('-').reverse().join('.')}</td><td>${a.bis.split('-').reverse().join('.')}</td><td>${a.tage}</td><td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td><td><span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span></td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Noch keine Anträge.</p>'}`;
+${antraege.length?`<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th><th>Kommentar</th></tr></thead>
+<tbody>${antraege.map(a=>`<tr><td>${(a.von||'').split('-').reverse().join('.')}</td><td>${(a.bis||'').split('-').reverse().join('.')}</td><td>${a.tage}</td>
+<td><span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span></td>
+<td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Noch keine Anträge.</p>'}`;
 }
 
 async function urlaubStellen(){
@@ -349,21 +569,23 @@ async function urlaubStellen(){
   const msg=document.getElementById('urlaub-msg');
   if(!von||!bis){msg.innerHTML='<div class="alert alert-warn">Bitte Von und Bis ausfüllen.</div>';return;}
   if(von>bis){msg.innerHTML='<div class="alert alert-warn">Von darf nicht nach Bis liegen.</div>';return;}
-  let tage=0;for(let d=new Date(von);d<=new Date(bis);d.setDate(d.getDate()+1)){const dw=d.getDay();if(dw&&dw<6)tage++;}
-  const r=await api.post('antraege',{userId:CU.id,von,bis,tage,kommentar:k});
-  if(r.ok){await loadPending();msg.innerHTML='<div class="alert alert-success">✓ Antrag eingereicht.</div>';setTimeout(()=>render(),1500);}
+  let tage=0; for(let d=new Date(von);d<=new Date(bis);d.setDate(d.getDate()+1)){const dw=d.getDay();if(dw&&dw<6)tage++;}
+  const r=await api.post('antraege',{userId:CU.id,typ:'urlaub',von,bis,tage,kommentar:k});
+  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Antrag eingereicht.</div>';setTimeout(render,1500);}
   else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
 }
 
-function pgKrank(){return`<div class="page-hd"><h1>Krankmeldung</h1></div>
-<div class="alert alert-info">Trag deinen Kranktag hier ein.</div>
+// ── Krankmeldung (MA) ─────────────────────────────────────────────────────────
+function pgKrank(){
+  return`<div class="page-hd"><h1>Krankmeldung</h1></div>
 <div class="card"><div class="card-title">Kranktag eintragen</div>
   <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="kd" class="form-inp" value="${today()}"></div>
   <div class="form-row"><label class="form-lbl">Bis (optional)</label><input type="date" id="kbd" class="form-inp"></div>
   <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kk" class="form-inp" placeholder="z.B. Erkältung"></div>
   <button class="btn btn-primary" onclick="krankmelden()">🏥 Eintragen</button>
   <div id="krank-msg" style="margin-top:8px"></div>
-</div>`;}
+</div>`;
+}
 
 async function krankmelden(){
   const d=document.getElementById('kd').value,bis=document.getElementById('kbd').value||d,k=document.getElementById('kk').value;
@@ -371,135 +593,218 @@ async function krankmelden(){
   if(!d){msg.innerHTML='<div class="alert alert-warn">Bitte Datum wählen.</div>';return;}
   for(let cur=new Date(d);cur<=new Date(bis);cur.setDate(cur.getDate()+1))
     await api.post('buchen',{userId:CU.id,typ:'krank',kommentar:k||'Krank'});
-  msg.innerHTML='<div class="alert alert-success">✓ Kranktag eingetragen.</div>';
+  msg.innerHTML='<div class="alert alert-success">✓ Eingetragen.</div>';
 }
 
-async function pgAnwesenheit(){
-  const data=await api.get('anwesenheit');
-  return`<div class="page-hd"><h1>Anwesenheit — ${fmtD(new Date())}</h1>${pending>0?`<span class="pill pill-offen">${pending} offene Anträge</span>`:''}</div>
-<div class="anw-grid">${data.map(u=>{const c=u.status.status==='ein'&&!u.status.inPause?'#16a34a':u.status.inPause?'#d97706':'#9ca3af';const lbl=u.status.status==='ein'&&!u.status.inPause?'Anwesend'+(u.status.seit?' seit '+u.status.seit:''):u.status.inPause?'Pause':'Abwesend';return`<div class="anw-card"><div class="anw-dot" style="background:${c}"></div><div><div class="anw-name">${esc(u.name)}</div><div class="anw-sub">${lbl}</div></div></div>`;}).join('')}</div>
-<div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Monatsübersicht — ${monatName(monat())}</div>
-<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Istzeit</th><th>Soll</th><th>Saldo</th><th>Krank</th><th>Urlaub</th></tr></thead>
-<tbody>${data.map(u=>{const kn=u.konten;return`<tr><td style="font-weight:500">${esc(u.name)}</td><td>${fmtH(kn.istH)}</td><td>${u.soll_stunden}h</td><td class="${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</td><td>${kn.krank}</td><td>${kn.urlaubGenommen}/${u.urlaub_anspruch}</td></tr>`;}).join('')}</tbody></table></div>
-<p style="font-size:12px;color:var(--text3);margin-top:8px">⟳ Echtzeit — aktualisiert sofort wenn jemand stempelt.</p>`;
+// ── Korrekturantrag (MA) ──────────────────────────────────────────────────────
+function pgKorrektur(){
+  return`<div class="page-hd"><h1>Korrekturantrag</h1></div>
+<div class="alert alert-info">Buchungsfehler? Stelle hier einen Korrekturantrag. Der Admin prüft und genehmigt ihn.</div>
+<div class="card"><div class="card-title">Korrektur beantragen</div>
+  <div class="form-row"><label class="form-lbl">Datum</label><input type="date" id="kor-d" class="form-inp" value="${today()}"></div>
+  <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="kor-k" class="form-inp" value="08:00"></div>
+  <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="kor-g" class="form-inp" value="17:00"></div>
+  <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="kor-p" class="form-inp" value="45" min="0"></div>
+  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kor-c" class="form-inp" placeholder="z.B. Handy vergessen"></div>
+  <button class="btn btn-primary" onclick="korrekturStellen()">📤 Antrag einreichen</button>
+  <div id="kor-msg" style="margin-top:8px"></div>
+</div>`;
 }
 
-async function pgAdminJournal(){
-  const mas=allUsers.filter(u=>u.role==='ma');if(!adminSelMa)adminSelMa=mas[0]?.id;
-  const mk=monat(),d=await api.get(`journal/${adminSelMa}?monat=${mk}`);
-  const{tage,konten:kn}=d,u=allUsers.find(x=>x.id===adminSelMa);
-  return`<div class="page-hd"><h1>Journal</h1></div>
-<div class="ma-chips">${mas.map(m=>`<div class="ma-chip${adminSelMa===m.id?' act':''}" onclick="adminSelMa='${m.id}';render()">${esc(m.name)}</div>`).join('')}</div>
-<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Istzeit</div><div class="stat-val" style="font-size:18px">${fmtH(kn.istH)}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Urlaubsrest</div><div class="stat-val" style="font-size:18px">${kn.urlaubRest}</div></div>
-</div>
-<div class="card" style="border-left:3px solid var(--warn)">
-  <div class="card-title">✏️ Vergessene Buchung nachtragen — ${esc(u?.name||'')}</div>
-  <div class="nb-grid">
-    <div><div class="nb-lbl">Datum</div><input type="date" id="nb-d" style="width:100%" value="${today()}"></div>
-    <div><div class="nb-lbl">Kommen</div><input type="time" id="nb-k" style="width:100%" value="08:00"></div>
-    <div><div class="nb-lbl">Gehen</div><input type="time" id="nb-g" style="width:100%" value="17:00"></div>
-    <div><div class="nb-lbl">Pause (min)</div><input type="number" id="nb-p" style="width:100%" value="45" min="0"></div>
-    <div><button class="btn btn-primary" onclick="adminNachbuchen()" style="height:34px">Eintragen</button></div>
-  </div>
-  <div style="margin-top:8px"><div class="nb-lbl">Kommentar</div><input type="text" id="nb-c" style="width:100%;max-width:400px" placeholder="z.B. Handy vergessen"></div>
-  <div id="nb-msg" style="margin-top:8px"></div>
-</div>
-<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Tag</th><th>Kommen</th><th>Gehen</th><th>Pause</th><th>Netto</th><th>Typ</th><th>Kommentar</th><th></th></tr></thead>
-<tbody>${tage.map(t=>{const dw=['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(t.date+'T12:00:00').getDay()];return`<tr><td>${t.date.split('-').reverse().join('.')}</td><td style="color:var(--text3)">${dw}</td><td>${t.ein||'—'}</td><td>${t.aus||'—'}</td><td>${t.pauseMin?t.pauseMin+'min':'—'}</td><td>${t.netto!==null?fmtH(t.netto):'—'}</td><td><span class="pill ${t.typ==='krank'?'pill-krank':t.typ==='urlaub'?'pill-urlaub':t.nachbuchung?'pill-nb':'pill-ok'}">${t.typ==='krank'?'Krank':t.typ==='urlaub'?'Urlaub':t.nachbuchung?'NB':'✓'}</span></td><td><input class="tbl-inp" value="${esc(t.kommentar)}" placeholder="Kommentar…" onchange="saveKomm('${adminSelMa}','${t.date}',this.value)"></td><td><button class="btn btn-sm btn-danger" onclick="loeschTag('${adminSelMa}','${t.date}')">🗑</button></td></tr>`;}).join('')||'<tr><td colspan="9" style="color:var(--text3);text-align:center;padding:16px">Keine Buchungen</td></tr>'}</tbody></table></div>`;
-}
-
-async function adminNachbuchen(){
-  const d=document.getElementById('nb-d').value,k=document.getElementById('nb-k').value,g=document.getElementById('nb-g').value,p=document.getElementById('nb-p').value,c=document.getElementById('nb-c').value,msg=document.getElementById('nb-msg');
-  if(!d||!k||!g){msg.innerHTML='<div class="alert alert-warn">Datum, Kommen und Gehen sind Pflicht.</div>';return;}
+async function korrekturStellen(){
+  const datum=document.getElementById('kor-d').value,k=document.getElementById('kor-k').value,
+        g=document.getElementById('kor-g').value,p=document.getElementById('kor-p').value,
+        c=document.getElementById('kor-c').value,msg=document.getElementById('kor-msg');
+  if(!datum||!k||!g){msg.innerHTML='<div class="alert alert-warn">Datum, Kommen und Gehen sind Pflicht.</div>';return;}
   if(k>=g){msg.innerHTML='<div class="alert alert-warn">Gehenzeit muss nach Kommenzeit liegen.</div>';return;}
-  const r=await api.post('nachbuchen',{userId:adminSelMa,datum:d,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c});
-  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Nachbuchung gespeichert.</div>';render();}
+  const r=await api.post('antraege',{userId:CU.id,typ:'korrektur',datum,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c});
+  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Korrekturantrag eingereicht.</div>';}
   else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
 }
 
-async function loeschTag(uid,date){if(!confirm('Alle Buchungen für diesen Tag wirklich löschen?'))return;await api.del(`buchungen/${uid}/${date}`);render();}
-
-async function pgAdminAntraege(){
-  const alle=await api.get('antraege');
-  const offen=alle.filter(a=>a.status==='offen'),entsch=alle.filter(a=>a.status!=='offen');
-  return`<div class="page-hd"><h1>Antragswesen</h1></div>
-${offen.length?`<div class="alert alert-warn">⚠️ ${offen.length} offene${offen.length===1?' Antrag':' Anträge'}.</div>`:'<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Offen (${offen.length})</div>
-${offen.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Von</th><th>Bis</th><th>Tage</th><th>Kommentar</th><th>Aktion</th></tr></thead>
-<tbody>${offen.map(a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td>${a.von.split('-').reverse().join('.')}</td><td>${a.bis.split('-').reverse().join('.')}</td><td>${a.tage}</td><td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td><td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.id},'genehmigt')">✓ Genehmigen</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.id},'abgelehnt')">✕ Ablehnen</button></td></tr>`).join('')}</tbody></table></div>`:''}
+// ── Meine Anträge (MA) ────────────────────────────────────────────────────────
+async function pgMeineAntraege(){
+  const alle=await api.get(`antraege?userId=${CU.id}`);
+  const urlaub=alle.filter(a=>a.typ==='urlaub'), korrekturen=alle.filter(a=>a.typ==='korrektur');
+  const statusPill=a=>`<span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span>`;
+  return`<div class="page-hd"><h1>Meine Anträge</h1></div>
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🏖️ Urlaubsanträge</div>
+${urlaub.length?`<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th><th>Kommentar</th></tr></thead>
+<tbody>${urlaub.map(a=>`<tr><td>${(a.von||'').split('-').reverse().join('.')}</td><td>${(a.bis||'').split('-').reverse().join('.')}</td><td>${a.tage}</td><td>${statusPill(a)}</td><td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px;margin-bottom:12px">Keine Urlaubsanträge.</p>'}
 <div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Entschieden</div>
-${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th></tr></thead>
-<tbody>${entsch.map(a=>`<tr><td>${esc(a.userName)}</td><td>${a.von.split('-').reverse().join('.')}</td><td>${a.bis.split('-').reverse().join('.')}</td><td>${a.tage}</td><td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td></tr>`).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">✏️ Korrekturanträge</div>
+${korrekturen.length?`<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Kommen</th><th>Gehen</th><th>Status</th><th>Kommentar</th></tr></thead>
+<tbody>${korrekturen.map(a=>`<tr><td>${(a.datum||'').split('-').reverse().join('.')}</td><td>${a.kommen||'—'}</td><td>${a.gehen||'—'}</td><td>${statusPill(a)}</td><td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Keine Korrekturanträge.</p>'}`;
 }
 
-async function entscheide(id,status){await api.patch(`antraege/${id}`,{status});await loadPending();render();}
+// ── Admin: Anwesenheit ────────────────────────────────────────────────────────
+async function pgAnwesenheit(){
+  const data=await api.get('anwesenheit');
+  return`<div class="page-hd"><h1>Anwesenheit — ${fmtD(new Date())}</h1>${pending>0?`<span class="pill pill-offen">${pending} offene Anträge</span>`:''}</div>
+<div class="anw-grid">${data.map(u=>{
+  const c=u.status.status==='ein'&&!u.status.inPause?'#16a34a':u.status.inPause?'#d97706':'#9ca3af';
+  const lbl=u.status.status==='ein'&&!u.status.inPause?'Anwesend'+(u.status.seit?' seit '+u.status.seit:''):u.status.inPause?'Pause':'Abwesend';
+  return`<div class="anw-card"><div class="anw-dot" style="background:${c}"></div><div><div class="anw-name">${esc(u.name)}</div><div class="anw-sub">${lbl}</div></div></div>`;
+}).join('')}</div>
+<div class="sep"></div>
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Monatsübersicht — ${monatName(monat())}</div>
+<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Istzeit</th><th>Soll</th><th>Saldo</th><th>Übertrag</th><th>Fehler</th><th>Krank</th><th>Urlaub</th></tr></thead>
+<tbody>${data.map(u=>{const kn=u.konten;return`<tr>
+  <td style="font-weight:500;cursor:pointer" onclick="adminSelMa='${u.id}';calMonat='${monat()}';nav('kalender')">${esc(u.name)}</td>
+  <td>${fmtH(kn.istH)}</td><td>${u.soll_stunden}h</td>
+  <td class="${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</td>
+  <td>${fmtH(kn.uebertragStunden)}</td>
+  <td class="${kn.fehler>0?'neg':''}">${kn.fehler}</td>
+  <td>${kn.krank}</td>
+  <td>${kn.urlaubGenommen}/${u.urlaub_anspruch}</td>
+</tr>`;}).join('')}</tbody></table></div>`;
+}
 
+// ── Admin: Anträge ────────────────────────────────────────────────────────────
+async function pgAntraege(){
+  const alle=await api.get('antraege');
+  const offen=alle.filter(a=>a.status==='offen'), entsch=alle.filter(a=>a.status!=='offen');
+  const urlaubRow=a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td><span class="pill pill-urlaub">Urlaub</span></td>
+    <td>${(a.von||'').split('-').reverse().join('.')} – ${(a.bis||'').split('-').reverse().join('.')} (${a.tage}d)</td>
+    <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
+    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.id},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.id},'abgelehnt')">✕</button></td></tr>`;
+  const korrRow=a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td><span class="pill pill-nb">Korrektur</span></td>
+    <td>${(a.datum||'').split('-').reverse().join('.')} ${a.kommen}–${a.gehen} (${a.pauseMin}min Pause)</td>
+    <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
+    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.id},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.id},'abgelehnt')">✕</button></td></tr>`;
+  const entschRow=a=>`<tr><td>${esc(a.userName)}</td><td>${a.typ==='urlaub'?'Urlaub':'Korrektur'}</td>
+    <td>${a.typ==='urlaub'?(a.von||'').split('-').reverse().join('.'):'('+((a.datum||'').split('-').reverse().join('.'))+')'}</td>
+    <td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td></tr>`;
+  return`<div class="page-hd"><h1>Anträge</h1></div>
+${offen.length?`<div class="alert alert-warn">⚠️ ${offen.length} offene Anträge</div>`:'<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Offen (${offen.length})</div>
+${offen.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Details</th><th>Kommentar</th><th>Aktion</th></tr></thead>
+<tbody>${offen.map(a=>a.typ==='korrektur'?korrRow(a):urlaubRow(a)).join('')}</tbody></table></div>`:''}
+<div class="sep"></div>
+<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Entschieden</div>
+${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Datum</th><th>Status</th></tr></thead>
+<tbody>${entsch.map(entschRow).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
+}
+
+async function entscheide(id,status){ await api.patch(`antraege/${id}`,{status}); await loadPending(); render(); }
+
+// ── Admin: Mitarbeiter ────────────────────────────────────────────────────────
+const TAGE_NAMEN=['So','Mo','Di','Mi','Do','Fr','Sa'];
 async function pgMitarbeiter(){
   const mas=allUsers.filter(u=>u.role==='ma');
+  const maRows=mas.map(u=>{
+    const arbTageChecks=[1,2,3,4,5,6,0].map(d=>`<label class="day-check"><input type="checkbox" ${(u.arbeitstage||[1,2,3,4,5]).includes(d)?'checked':''} data-d="${d}" class="at-${u.id}"> ${TAGE_NAMEN[d]}</label>`).join('');
+    return`<tr>
+      <td style="font-weight:500">${esc(u.name)}<br><span style="font-size:11px;color:var(--text3)">@${esc(u.username)}</span></td>
+      <td><input type="number" id="s-${u.id}" class="tbl-inp" style="width:65px;border:1px solid var(--border2)" value="${u.soll_stunden}"></td>
+      <td><input type="number" id="ur-${u.id}" class="tbl-inp" style="width:65px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td>
+      <td><div class="day-checks">${arbTageChecks}</div></td>
+      <td><input type="password" id="pw-${u.id}" class="tbl-inp" style="width:110px;border:1px solid var(--border2)" placeholder="Neues PW"></td>
+      <td><button class="btn btn-sm btn-primary" onclick="updateUser('${u.id}')">💾</button></td>
+    </tr>`;
+  }).join('');
+
+  const monate=[]; for(let i=0;i<12;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
+
   return`<div class="page-hd"><h1>Mitarbeiter</h1></div>
-<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Soll (h/Monat)</th><th>Urlaub (Tage/Jahr)</th><th>Passwort setzen</th><th>Speichern</th></tr></thead>
-<tbody>${mas.map(u=>`<tr>
-  <td style="font-weight:500">${esc(u.name)} ${u.has_password?'<span class="pill pill-ok" style="font-size:10px">🔒 gesetzt</span>':'<span class="pill pill-offen" style="font-size:10px">⚠ kein PW</span>'}</td>
-  <td><input type="number" id="s-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.soll_stunden}"></td>
-  <td><input type="number" id="u-${u.id}" class="tbl-inp" style="width:70px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td>
-  <td><div style="display:flex;gap:5px;align-items:center"><input type="password" id="pw-${u.id}" class="tbl-inp" style="width:130px;border:1px solid var(--border2)" placeholder="Neues Passwort"><button class="btn btn-sm btn-primary" onclick="setPasswort('${u.id}','pw-${u.id}','pwmsg-${u.id}')">🔑 Setzen</button></div><div id="pwmsg-${u.id}" style="font-size:11px;margin-top:3px"></div></td>
-  <td><button class="btn btn-sm" onclick="updateUser('${u.id}')">💾</button></td>
-</tr>`).join('')}</tbody></table></div>
+<div class="tbl-wrap"><table>
+<thead><tr><th>Name / Login</th><th>Soll h/Mo</th><th>Urlaub Tage</th><th>Arbeitstage</th><th>Passwort</th><th></th></tr></thead>
+<tbody>${maRows}</tbody></table></div>
 <div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--purple)"><div class="card-title">🔑 Admin-Passwort ändern</div>
-  <div class="form-row"><label class="form-lbl">Neues Passwort</label><input type="password" id="pw-admin" class="form-inp" placeholder="Neues Admin-Passwort"></div>
-  <button class="btn btn-primary" onclick="setPasswort('admin','pw-admin','pwmsg-admin')">🔑 Setzen</button>
-  <div id="pwmsg-admin" style="margin-top:8px"></div>
+<div class="card" style="border-left:3px solid var(--accent)">
+  <div class="card-title">📊 Stundenkonto manuell anpassen</div>
+  <div class="form-row"><label class="form-lbl">Mitarbeiter</label>
+    <select id="ue-ma" class="form-inp">${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
+  <div class="form-row"><label class="form-lbl">Monat</label>
+    <select id="ue-mo" class="form-inp">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
+  <div class="form-row"><label class="form-lbl">Stunden-Übertrag</label>
+    <input type="number" id="ue-h" class="form-inp" step="0.5" placeholder="z.B. -8 oder 5.5"></div>
+  <div class="form-row"><label class="form-lbl">Urlaub-Übertrag</label>
+    <input type="number" id="ue-u" class="form-inp" placeholder="z.B. 2"></div>
+  <button class="btn btn-primary" onclick="saveUebertrag()">💾 Übertrag speichern</button>
+  <div id="ue-msg" style="margin-top:8px"></div>
 </div>
 <div class="sep"></div>
-<div class="card"><div class="card-title">Neuen Mitarbeiter anlegen</div>
+<div class="card" style="border-left:3px solid var(--purple)">
+  <div class="card-title">🔑 Admin-Passwort / Benutzername</div>
+  <div class="form-row"><label class="form-lbl">Benutzername</label>
+    <input type="text" id="adm-un" class="form-inp" value="${esc(allUsers.find(u=>u.role==='admin')?.username||'admin')}"></div>
+  <div class="form-row"><label class="form-lbl">Neues Passwort</label>
+    <input type="password" id="adm-pw" class="form-inp" placeholder="Leer lassen = unverändert"></div>
+  <button class="btn btn-primary" onclick="updateAdmin()">💾 Speichern</button>
+  <div id="adm-msg" style="margin-top:8px"></div>
+</div>
+<div class="sep"></div>
+<div class="card"><div class="card-title">➕ Neuen Mitarbeiter anlegen</div>
   <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="neu-name" class="form-inp" placeholder="Max Mustermann"></div>
+  <div class="form-row"><label class="form-lbl">Benutzername</label><input type="text" id="neu-un" class="form-inp" placeholder="mmustermann"></div>
+  <div class="form-row"><label class="form-lbl">Passwort</label><input type="password" id="neu-pw" class="form-inp" placeholder="Mind. 4 Zeichen"></div>
   <div class="form-row"><label class="form-lbl">ID</label><input type="text" id="neu-id" class="form-inp" placeholder="ma6"></div>
   <div class="form-row"><label class="form-lbl">Soll (h/Monat)</label><input type="number" id="neu-soll" class="form-inp" value="160"></div>
   <div class="form-row"><label class="form-lbl">Urlaub (Tage)</label><input type="number" id="neu-urlaub" class="form-inp" value="20"></div>
-  <div class="form-row"><label class="form-lbl">Passwort</label><input type="password" id="neu-pw" class="form-inp" placeholder="Initiales Passwort (Pflicht)"></div>
   <button class="btn btn-primary" onclick="neuenMA()">+ Anlegen</button>
   <div id="ma-msg" style="margin-top:8px"></div>
 </div>`;
 }
 
-async function updateUser(id){const r=await api.patch(`users/${id}`,{soll_stunden:+document.getElementById('s-'+id).value,urlaub_anspruch:+document.getElementById('u-'+id).value});if(r.ok){await loadUsers();alert('Gespeichert.');}}
+async function updateUser(id){
+  const soll=+document.getElementById('s-'+id).value;
+  const urlaub=+document.getElementById('ur-'+id).value;
+  const pw=document.getElementById('pw-'+id).value;
+  const arbBoxen=document.querySelectorAll('.at-'+id+':checked');
+  const arbeitstage=Array.from(arbBoxen).map(b=>+b.dataset.d);
+  const body={soll_stunden:soll,urlaub_anspruch:urlaub,arbeitstage};
+  if(pw) body.password=pw;
+  const r=await api.patch('users/'+id,body);
+  if(r.ok){await loadUsers();alert('Gespeichert.');}
+  else alert('Fehler: '+r.error);
+}
 
-async function setPasswort(userId, inputId, msgId){
-  const pw=document.getElementById(inputId).value;
-  const msgEl=document.getElementById(msgId);
-  if(!pw){msgEl.innerHTML='<span style="color:var(--danger)">Bitte Passwort eingeben.</span>';return;}
-  if(pw.length<4){msgEl.innerHTML='<span style="color:var(--danger)">Mindestens 4 Zeichen.</span>';return;}
-  const r=await api.patch(`users/${userId}`,{password:pw});
-  if(r.ok){document.getElementById(inputId).value='';msgEl.innerHTML='<span style="color:var(--success)">✓ Passwort gesetzt.</span>';await loadUsers();render();}
-  else msgEl.innerHTML=`<span style="color:var(--danger)">Fehler: ${r.error}</span>`;
+async function updateAdmin(){
+  const un=document.getElementById('adm-un').value.trim();
+  const pw=document.getElementById('adm-pw').value;
+  const msg=document.getElementById('adm-msg');
+  const admin=allUsers.find(u=>u.role==='admin');
+  if(!admin)return;
+  const body={username:un};
+  if(pw){if(pw.length<4){msg.innerHTML='<div class="alert alert-warn">Mind. 4 Zeichen.</div>';return;} body.password=pw;}
+  const r=await api.patch('users/'+admin.id,body);
+  msg.innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+  if(r.ok)await loadUsers();
+}
+
+async function saveUebertrag(){
+  const ma=document.getElementById('ue-ma').value, mo=document.getElementById('ue-mo').value;
+  const h=parseFloat(document.getElementById('ue-h').value)||0, u=parseInt(document.getElementById('ue-u').value)||0;
+  const msg=document.getElementById('ue-msg');
+  const r=await api.post(`uebertrag/${ma}/${mo}`,{stunden:h,urlaub:u});
+  msg.innerHTML=r.ok?'<div class="alert alert-success">✓ Übertrag gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';
 }
 
 async function neuenMA(){
-  const name=document.getElementById('neu-name').value.trim(),id=document.getElementById('neu-id').value.trim(),soll=+document.getElementById('neu-soll').value,urlaub=+document.getElementById('neu-urlaub').value,pw=document.getElementById('neu-pw').value;
+  const name=document.getElementById('neu-name').value.trim();
+  const un=document.getElementById('neu-un').value.trim();
+  const pw=document.getElementById('neu-pw').value;
+  const id=document.getElementById('neu-id').value.trim();
+  const soll=+document.getElementById('neu-soll').value;
+  const urlaub=+document.getElementById('neu-urlaub').value;
   const msg=document.getElementById('ma-msg');
-  if(!name||!id){msg.innerHTML='<div class="alert alert-warn">Name und ID sind Pflicht.</div>';return;}
-  if(!pw||pw.length<4){msg.innerHTML='<div class="alert alert-warn">Passwort ist Pflicht (mind. 4 Zeichen).</div>';return;}
-  const r=await api.post('users',{id,name,role:'ma',soll_stunden:soll,urlaub_anspruch:urlaub});
-  if(r.ok){
-    await api.patch(`users/${id}`,{password:pw});
-    await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';
-  } else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+  if(!name||!un||!id){msg.innerHTML='<div class="alert alert-warn">Name, Benutzername und ID sind Pflicht.</div>';return;}
+  if(!pw||pw.length<4){msg.innerHTML='<div class="alert alert-warn">Passwort mind. 4 Zeichen.</div>';return;}
+  const r=await api.post('users',{id,username:un,name,role:'ma',soll_stunden:soll,urlaub_anspruch:urlaub,arbeitstage:[1,2,3,4,5],password:pw});
+  if(r.ok){await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';}
+  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
 }
 
+// ── Admin: Einstellungen ──────────────────────────────────────────────────────
 async function pgEinstellungen(){
   const s=await api.get('settings');
-  const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
+  const monate=[]; for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
   return`<div class="page-hd"><h1>Einstellungen</h1></div>
-<div class="card"><div class="card-title">⏸ Pausenregelungen</div>
+<div class="card"><div class="card-title">⏸ Pausenregelungen (gesetzlich)</div>
   <div class="form-row"><label class="form-lbl">Ab 6h Arbeitszeit</label><input type="number" id="p6" class="form-inp" value="${s.pause6h||30}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
   <div class="form-row"><label class="form-lbl">Ab 9h Arbeitszeit</label><input type="number" id="p9" class="form-inp" value="${s.pause9h||45}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
+  <div class="alert alert-info" style="margin-top:8px">Die Pause wird automatisch abgezogen, wenn die manuelle Pause kleiner als die gesetzliche Vorgabe ist.</div>
 </div>
 <div class="card"><div class="card-title">🏢 Firma</div>
   <div class="form-row"><label class="form-lbl">Firmenname</label><input type="text" id="firma" class="form-inp" value="${esc(s.firmaName||'')}"></div>
@@ -507,35 +812,48 @@ async function pgEinstellungen(){
 <button class="btn btn-primary" onclick="saveSettings()">💾 Speichern</button>
 <div id="set-msg" style="margin-top:8px"></div>
 <div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--danger)"><div class="card-title">📅 Monatsabschluss</div>
-  <div class="alert alert-warn" style="margin-bottom:10px">⚠️ Immer erst Export erstellen!</div>
+<div class="card" style="border-left:3px solid var(--danger)">
+  <div class="card-title">📅 Monatsabschluss</div>
+  <div class="alert alert-warn" style="margin-bottom:10px">⚠️ Der Saldo wird automatisch als Übertrag in den Folgemonat übernommen. Erst Export erstellen!</div>
   <div class="form-row"><label class="form-lbl">Monat</label><select id="abschl-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <button class="btn btn-danger" onclick="monatsabschluss()">⚠️ Monatsabschluss</button>
+  <button class="btn btn-danger" onclick="monatsabschluss()">⚠️ Abschluss durchführen</button>
   <div id="abschl-msg" style="margin-top:8px"></div>
 </div>`;
 }
 
-async function saveSettings(){const r=await api.post('settings',{pause6h:document.getElementById('p6').value,pause9h:document.getElementById('p9').value,firmaName:document.getElementById('firma').value});document.getElementById('set-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';}
-async function monatsabschluss(){const mo=document.getElementById('abschl-mo').value;if(!confirm(`Monatsabschluss für ${monatName(mo)} wirklich durchführen?`))return;const r=await api.post('monatsabschluss',{monat:mo});document.getElementById('abschl-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Durchgeführt.</div>':'<div class="alert alert-danger">Fehler.</div>';}
+async function saveSettings(){
+  const r=await api.post('settings',{pause6h:+document.getElementById('p6').value,pause9h:+document.getElementById('p9').value,firmaName:document.getElementById('firma').value});
+  document.getElementById('set-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';
+  if(r.ok){const s=await api.get('settings');document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';}
+}
 
+async function monatsabschluss(){
+  const mo=document.getElementById('abschl-mo').value;
+  if(!confirm(`Monatsabschluss für ${monatName(mo)} wirklich durchführen?\nDer Saldo wird als Übertrag übernommen.`))return;
+  const r=await api.post('monatsabschluss',{monat:mo});
+  document.getElementById('abschl-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Abschluss durchgeführt. Übertrag gesetzt.</div>':'<div class="alert alert-danger">Fehler.</div>';
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
 function pgExport(){
   const mas=allUsers.filter(u=>u.role==='ma');
-  const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
+  const monate=[]; for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
   return`<div class="page-hd"><h1>Export</h1></div>
 <div class="card"><div class="card-title">📊 Monatsbericht</div>
   <div class="form-row"><label class="form-lbl">Monat</label><select id="exp-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
   <div class="form-row"><label class="form-lbl">Mitarbeiter</label><select id="exp-ma" class="form-inp" style="max-width:220px"><option value="">Alle</option>${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
-  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-    <button class="btn btn-primary" onclick="exportCSV()">📄 Als CSV (Excel)</button>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button class="btn btn-primary" onclick="exportCSV()">📄 Als CSV exportieren</button>
   </div>
 </div>`;
 }
 
 function exportCSV(){const mo=document.getElementById('exp-mo').value,ma=document.getElementById('exp-ma').value;window.open('/api/export/csv?monat='+mo+(ma?'&userId='+ma:''),'_blank');}
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 connectSSE();
-loadUsers(); // lädt allUsers für Admin-Ansichten (ohne Passwort-Hashes)
-checkSetup(); // prüft ob Admin-Passwort bereits gesetzt ist
+loadUsers();
+checkSetup();
 </script>
 </body>
 </html>
