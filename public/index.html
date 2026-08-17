@@ -119,12 +119,12 @@ tbody tr:hover{background:var(--surface2)}
 .cal-day.today .cal-dn{color:var(--accent)}
 .cal-tag{font-size:10px;font-weight:600;padding:2px 5px;border-radius:4px;display:inline-block;margin-bottom:2px}
 .cal-tag-normal {background:var(--success-bg);color:var(--success)}
-.cal-tag-aktiv  {background:var(--accent-bg);color:var(--accent-text)}
-.cal-tag-krank  {background:var(--danger-bg);color:var(--danger)}
+.cal-tag-aktiv   {background:var(--accent-bg);color:var(--accent-text)}
+.cal-tag-krank   {background:var(--danger-bg);color:var(--danger)}
 .cal-tag-urlaub {background:var(--purple-bg);color:var(--purple)}
 .cal-tag-fehler {background:var(--orange-bg);color:var(--orange)}
 .cal-tag-frei   {background:var(--bg);color:var(--text3)}
-.cal-tag-offen  {background:var(--surface2);color:var(--text3)}
+.cal-tag-offen   {background:var(--surface2);color:var(--text3)}
 .cal-time{font-size:10px;color:var(--text3);line-height:1.4}
 .cal-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text2);margin-bottom:12px}
 .cal-legend span{display:flex;align-items:center;gap:4px}
@@ -232,10 +232,10 @@ const esc    = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 const fmtH   = h => { if(h===null||h===undefined)return'—'; const neg=h<0; h=Math.abs(h); const hi=Math.floor(h),mi=Math.round((h-hi)*60); return(neg?'-':'')+hi+'h '+pad(mi)+'m'; };
 
 const api = {
-  get:   url           => fetch('/api/'+url).then(r=>r.json()),
-  post:  (url,data)    => fetch('/api/'+url,{method:'POST',  headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  patch: (url,data)    => fetch('/api/'+url,{method:'PATCH', headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  del:   url           => fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
+  get:   url         => fetch('/api/'+url).then(r=>r.json()),
+  post:  (url,data)  => fetch('/api/'+url,{method:'POST',  headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  patch: (url,data)  => fetch('/api/'+url,{method:'PATCH', headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  del:   url         => fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
 };
 
 let CU=null, page='kalender', allUsers=[], pending=0, clockInt=null, sse=null;
@@ -286,6 +286,7 @@ async function doLogin(){
   const data=await r.json();
   if(!r.ok){err.textContent=data.error||'Anmeldung fehlgeschlagen.';return;}
   CU=data.user;
+  await loadUsers();
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
   document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
@@ -296,11 +297,13 @@ async function doLogin(){
   await loadPending();
   const s=await api.get('settings');
   document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';
+  connectSSE();
   render();
 }
 
 function logout(){
   CU=null;
+  if(sse) sse.close();
   document.getElementById('login-user').value='';
   document.getElementById('login-pw').value='';
   document.getElementById('login-err').textContent='';
@@ -310,7 +313,13 @@ function logout(){
 
 // ── Data Loading ──────────────────────────────────────────────────────────────
 async function loadUsers(){ allUsers=await api.get('users'); }
-async function loadPending(){ const a=await api.get(''); pending=a.filter(x=>x.status==='offen').length; renderSidebar(); }
+async function loadPending(){ 
+  try {
+    const a=await api.get('antraege'); 
+    pending=Array.isArray(a)?a.filter(x=>x.status==='offen').length:0; 
+  } catch(e) { pending=0; }
+  renderSidebar(); 
+}
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 function renderSidebar(){
@@ -322,7 +331,7 @@ function renderSidebar(){
     <button ${sb('anwesenheit')}>👥 Anwesenheit</button>
     <button ${sb('kalender')}>📅 Kalender</button>
     <div class="sb-section">Verwaltung</div>
-    <button ${sb('')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
+    <button ${sb('antraege')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
     <button ${sb('mitarbeiter')}>👤 Mitarbeiter</button>
     <button ${sb('einstellungen')}>⚙️ Einstellungen</button>
     <div class="sb-section">Auswertung</div>
@@ -336,7 +345,7 @@ function renderSidebar(){
     <button ${sb('krank')}>🏥 Krankmeldung</button>
     <button ${sb('korrektur')}>✏️ Korrekturantrag</button>
     <div class="sb-section">Anträge</div>
-    <button ${sb('meine-')}>📋 Meine Anträge</button>
+    <button ${sb('meine-antraege')}>📋 Meine Anträge</button>
   `;
 }
 
@@ -350,19 +359,19 @@ async function render(){
   try{
     const isAdmin=CU?.role==='admin';
     if(isAdmin){
-      if(page==='anwesenheit')  el.innerHTML=await pgAnwesenheit();
-      else if(page==='kalender')el.innerHTML=await pgKalender(adminSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id, true);
-      else if(page==='')el.innerHTML=await pg();
+      if(page==='anwesenheit')     el.innerHTML=await pgAnwesenheit();
+      else if(page==='kalender')   el.innerHTML=await pgKalender(adminSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id, true);
+      else if(page==='antraege')   el.innerHTML=await pgAntraege();
       else if(page==='mitarbeiter')el.innerHTML=await pgMitarbeiter();
       else if(page==='einstellungen')el.innerHTML=await pgEinstellungen();
       else el.innerHTML=pgExport();
     } else {
-      if(page==='buchen')       el.innerHTML=await pgBuchen();
-      else if(page==='kalender')el.innerHTML=await pgKalender(CU.id, false);
-      else if(page==='urlaub')  el.innerHTML=await pgUrlaub();
-      else if(page==='krank')   el.innerHTML=pgKrank();
+      if(page==='buchen')        el.innerHTML=await pgBuchen();
+      else if(page==='kalender') el.innerHTML=await pgKalender(CU.id, false);
+      else if(page==='urlaub')   el.innerHTML=await pgUrlaub();
+      else if(page==='krank')    el.innerHTML=pgKrank();
       else if(page==='korrektur')el.innerHTML=pgKorrektur();
-      else if(page==='meine-')el.innerHTML=await pgMeine();
+      else if(page==='meine-antraege')el.innerHTML=await pgMeine();
     }
   }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${esc(e.message)}</div>`;}
   startClock();
@@ -394,17 +403,16 @@ async function pgKalender(userId, isAdmin){
   const selId = userId || CU.id;
   const mas   = allUsers.filter(u=>u.role==='ma');
   const d     = await api.get(`journal/${selId}?monat=${calMonat}`);
-  const {tage, konten:kn} = d;
+  const {tage=[], konten:kn={istH:0,saldo:0,uebertragStunden:0,krank:0,fehler:0,urlaubRest:0}} = d;
   const tageByDate = {};
   tage.forEach(t=>tageByDate[t.date]=t);
 
   const [year,mon] = calMonat.split('-').map(Number);
-  const firstDow   = (new Date(year,mon-1,1).getDay()+6)%7; // Mo=0
+  const firstDow   = (new Date(year,mon-1,1).getDay()+6)%7;
   const daysInMon  = new Date(year,mon,0).getDate();
   const todayStr   = today();
   const user       = allUsers.find(u=>u.id===selId);
 
-  // Kalender-Zellen
   let cells='';
   for(let i=0;i<firstDow;i++) cells+=`<div class="cal-day empty"></div>`;
   for(let day=1;day<=daysInMon;day++){
@@ -465,7 +473,6 @@ ${chipHtml}
 function prevMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m-2,1); return d.getFullYear()+'-'+pad(d.getMonth()+1); }
 function nextMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m,1);   return d.getFullYear()+'-'+pad(d.getMonth()+1); }
 
-// ── Kalender-Tag anklicken ────────────────────────────────────────────────────
 async function calTagClick(date, userId, isAdmin){
   const d    = await api.get(`journal/${userId}?monat=${date.slice(0,7)}`);
   const tag  = d.tage.find(t=>t.date===date);
@@ -474,7 +481,6 @@ async function calTagClick(date, userId, isAdmin){
   const typ  = tag?.typ||'offen';
 
   if(!isAdmin){
-    // MA sieht nur Details, kein Bearbeiten
     openModal(`<h3>📅 ${ds}</h3>
       <p style="font-size:13px;color:var(--text2);margin-bottom:8px">
         ${typ==='normal'?`Kommen: ${tag.ein} · Gehen: ${tag.aus} · Netto: ${fmtH(tag.netto)}`:
@@ -486,7 +492,6 @@ async function calTagClick(date, userId, isAdmin){
     return;
   }
 
-  // Admin: Bearbeiten-Modal
   openModal(`<h3>📅 ${ds} — ${esc(user?.name||'')}</h3>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
       Aktuell: <strong>${typ==='normal'?`${tag.ein}–${tag.aus} (${fmtH(tag.netto)})`:typ==='fehler'?'⚠️ '+esc(tag.kommentar||'Fehler'):typ==='krank'?'Krank':typ==='urlaub'?'Urlaub':typ==='aktiv'?'Aktiv (eingestempelt)':'Kein Eintrag'}</strong>
@@ -520,7 +525,7 @@ async function adminLoeschTag(userId,date){
 async function pgBuchen(){
   const mk=monat();
   const[st,jd]=await Promise.all([api.get(`users/${CU.id}/status`),api.get(`journal/${CU.id}?monat=${mk}`)]);
-  const kn=jd.konten,p=Math.min(100,Math.round(kn.istH/(kn.soll||1)*100));
+  const kn=jd.konten||{istH:0,soll:1,saldo:0,urlaubRest:0}, p=Math.min(100,Math.round((kn.istH/(kn.soll||1))*100));
   return`<div class="page-hd"><h1>Buchen — ${fmtD(new Date())}</h1></div>
 <div class="stamp-panel">
   <div><div class="clock-display" id="live-clock">${fmtT(new Date())}</div><div class="clock-date">${fmtD(new Date())}</div></div>
@@ -536,359 +541,89 @@ async function pgBuchen(){
   </div>
 </div>
 <div class="stat-grid">
-  <div class="stat-card"><div class="stat-lbl">Istzeit (Monat)</div><div class="stat-val">${fmtH(kn.istH)}</div><div class="stat-bar"><div class="stat-bar-fill${p>100?' over':''}" style="width:${Math.min(p,100)}%"></div></div><div class="stat-sub">${p}% von ${kn.soll}h</div></div>
-  <div class="stat-card"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div><div class="stat-sub">${kn.saldo>=0?'Guthaben':'Fehlzeit'}</div></div>
-  <div class="stat-card"><div class="stat-lbl">Resturlaub</div><div class="stat-val">${kn.urlaubRest}</div><div class="stat-sub">von ${CU.urlaub_anspruch} Tagen</div></div>
-  <div class="stat-card"><div class="stat-lbl">Kranktage</div><div class="stat-val ${kn.krank>0?'neg':''}">${kn.krank}</div><div class="stat-sub">diesen Monat</div></div>
+  <div class="stat-card"><div class="stat-lbl">Istzeit (Monat)</div><div class="stat-val">${fmtH(kn.istH)}</div><div class="stat-bar"><div class="stat-bar-fill${p>100?' over':''}" style="width:${p}%"></div></div></div>
+  <div class="stat-card"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
+  <div class="stat-card"><div class="stat-lbl">Resturlaub</div><div class="stat-val">${kn.urlaubRest} Tage</div></div>
 </div>`;
 }
 
-async function buchen(typ){ await api.post('buchen',{userId:CU.id,typ}); render(); }
-
-// ── Urlaubsantrag (MA) ────────────────────────────────────────────────────────
-async function pgUrlaub(){
-  const[,jd]=await Promise.all([api.get(`?userId=${CU.id}&typ=urlaub`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
-  const kn=jd.konten;
-  return`<div class="page-hd"><h1>Urlaubsantrag</h1></div>
-<div class="alert alert-info">Resturlaub: <strong>${kn.urlaubRest} Tage</strong></div>
-<div class="card"><div class="card-title">Neuen Antrag stellen</div>
-  <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="uv" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Bis (inkl.)</label><input type="date" id="ub" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="uk" class="form-inp" placeholder="z.B. Sommerurlaub"></div>
-  <button class="btn btn-primary" onclick="urlaubStellen()">📤 Antrag einreichen</button>
-  <div id="urlaub-msg" style="margin-top:8px"></div>
-</div>
-${antraege.length?`<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th><th>Kommentar</th></tr></thead>
-<tbody>${antraege.map(a=>`<tr><td>${(a.von||'').split('-').reverse().join('.')}</td><td>${(a.bis||'').split('-').reverse().join('.')}</td><td>${a.tage}</td>
-<td><span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span></td>
-<td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Noch keine Anträge.</p>'}`;
-}
-
-async function urlaubStellen(){
-  const von=document.getElementById('uv').value,bis=document.getElementById('ub').value,k=document.getElementById('uk').value;
-  const msg=document.getElementById('urlaub-msg');
-  if(!von||!bis){msg.innerHTML='<div class="alert alert-warn">Bitte Von und Bis ausfüllen.</div>';return;}
-  if(von>bis){msg.innerHTML='<div class="alert alert-warn">Von darf nicht nach Bis liegen.</div>';return;}
-  let tage=0; for(let d=new Date(von);d<=new Date(bis);d.setDate(d.getDate()+1)){const dw=d.getDay();if(dw&&dw<6)tage++;}
-  const r=await api.post('antraege',{userId:CU.id,typ:'urlaub',von,bis,tage,kommentar:k});
-  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Antrag eingereicht.</div>';setTimeout(render,1500);}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-}
-
-// ── Krankmeldung (MA) ─────────────────────────────────────────────────────────
-function pgKrank(){
-  return`<div class="page-hd"><h1>Krankmeldung</h1></div>
-<div class="card"><div class="card-title">Kranktag eintragen</div>
-  <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="kd" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Bis (optional)</label><input type="date" id="kbd" class="form-inp"></div>
-  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kk" class="form-inp" placeholder="z.B. Erkältung"></div>
-  <button class="btn btn-primary" onclick="krankmelden()">🏥 Eintragen</button>
-  <div id="krank-msg" style="margin-top:8px"></div>
-</div>`;
-}
-
-async function krankmelden(){
-  const d=document.getElementById('kd').value,bis=document.getElementById('kbd').value||d,k=document.getElementById('kk').value;
-  const msg=document.getElementById('krank-msg');
-  if(!d){msg.innerHTML='<div class="alert alert-warn">Bitte Datum wählen.</div>';return;}
-  for(let cur=new Date(d);cur<=new Date(bis);cur.setDate(cur.getDate()+1))
-    await api.post('buchen',{userId:CU.id,typ:'krank',kommentar:k||'Krank'});
-  msg.innerHTML='<div class="alert alert-success">✓ Eingetragen.</div>';
-}
-
-// ── Korrekturantrag (MA) ──────────────────────────────────────────────────────
-function pgKorrektur(){
-  return`<div class="page-hd"><h1>Korrekturantrag</h1></div>
-<div class="alert alert-info">Buchungsfehler? Stelle hier einen Korrekturantrag. Der Admin prüft und genehmigt ihn.</div>
-<div class="card"><div class="card-title">Korrektur beantragen</div>
-  <div class="form-row"><label class="form-lbl">Datum</label><input type="date" id="kor-d" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="kor-k" class="form-inp" value="08:00"></div>
-  <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="kor-g" class="form-inp" value="17:00"></div>
-  <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="kor-p" class="form-inp" value="45" min="0"></div>
-  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kor-c" class="form-inp" placeholder="z.B. Handy vergessen"></div>
-  <button class="btn btn-primary" onclick="korrekturStellen()">📤 Antrag einreichen</button>
-  <div id="kor-msg" style="margin-top:8px"></div>
-</div>`;
-}
-
-async function korrekturStellen(){
-  const datum=document.getElementById('kor-d').value,k=document.getElementById('kor-k').value,
-        g=document.getElementById('kor-g').value,p=document.getElementById('kor-p').value,
-        c=document.getElementById('kor-c').value,msg=document.getElementById('kor-msg');
-  if(!datum||!k||!g){msg.innerHTML='<div class="alert alert-warn">Datum, Kommen und Gehen sind Pflicht.</div>';return;}
-  if(k>=g){msg.innerHTML='<div class="alert alert-warn">Gehenzeit muss nach Kommenzeit liegen.</div>';return;}
-  const r=await api.post('antraege',{userId:CU.id,typ:'korrektur',datum,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c});
-  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Korrekturantrag eingereicht.</div>';}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-}
-
-// ── Meine Anträge (MA) ────────────────────────────────────────────────────────
-async function pgMeineAntraege(){
-  const alle=await api.get(`antraege?userId=${CU.id}`);
-  const urlaub=alle.filter(a=>a.typ==='urlaub'), korrekturen=alle.filter(a=>a.typ==='korrektur');
-  const statusPill=a=>`<span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span>`;
-  return`<div class="page-hd"><h1>Meine Anträge</h1></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🏖️ Urlaubsanträge</div>
-${urlaub.length?`<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th><th>Kommentar</th></tr></thead>
-<tbody>${urlaub.map(a=>`<tr><td>${(a.von||'').split('-').reverse().join('.')}</td><td>${(a.bis||'').split('-').reverse().join('.')}</td><td>${a.tage}</td><td>${statusPill(a)}</td><td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px;margin-bottom:12px">Keine Urlaubsanträge.</p>'}
-<div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">✏️ Korrekturanträge</div>
-${korrekturen.length?`<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Kommen</th><th>Gehen</th><th>Status</th><th>Kommentar</th></tr></thead>
-<tbody>${korrekturen.map(a=>`<tr><td>${(a.datum||'').split('-').reverse().join('.')}</td><td>${a.kommen||'—'}</td><td>${a.gehen||'—'}</td><td>${statusPill(a)}</td><td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Keine Korrekturanträge.</p>'}`;
-}
-
-// ── Admin: Anwesenheit ────────────────────────────────────────────────────────
-async function pgAnwesenheit(){
-  const data=await api.get('anwesenheit');
-  return`<div class="page-hd"><h1>Anwesenheit — ${fmtD(new Date())}</h1>${pending>0?`<span class="pill pill-offen">${pending} offene Anträge</span>`:''}</div>
-<div class="anw-grid">${data.map(u=>{
-  const c=u.status.status==='ein'&&!u.status.inPause?'#16a34a':u.status.inPause?'#d97706':'#9ca3af';
-  const lbl=u.status.status==='ein'&&!u.status.inPause?'Anwesend'+(u.status.seit?' seit '+u.status.seit:''):u.status.inPause?'Pause':'Abwesend';
-  return`<div class="anw-card"><div class="anw-dot" style="background:${c}"></div><div><div class="anw-name">${esc(u.name)}</div><div class="anw-sub">${lbl}</div></div></div>`;
-}).join('')}</div>
-<div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Monatsübersicht — ${monatName(monat())}</div>
-<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Istzeit</th><th>Soll</th><th>Saldo</th><th>Übertrag</th><th>Fehler</th><th>Krank</th><th>Urlaub</th></tr></thead>
-<tbody>${data.map(u=>{const kn=u.konten;return`<tr>
-  <td style="font-weight:500;cursor:pointer" onclick="adminSelMa='${u.id}';calMonat='${monat()}';nav('kalender')">${esc(u.name)}</td>
-  <td>${fmtH(kn.istH)}</td><td>${u.soll_stunden}h</td>
-  <td class="${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</td>
-  <td>${fmtH(kn.uebertragStunden)}</td>
-  <td class="${kn.fehler>0?'neg':''}">${kn.fehler}</td>
-  <td>${kn.krank}</td>
-  <td>${kn.urlaubGenommen}/${u.urlaub_anspruch}</td>
-</tr>`;}).join('')}</tbody></table></div>`;
+async function buchen(typ){
+  const r=await api.post('buchen',{typ});
+  if(r.ok) render(); else alert('Fehler: '+r.error);
 }
 
 // ── Admin: Anträge ────────────────────────────────────────────────────────────
 async function pgAntraege(){
-  const alle = await api.get('antraege');
-  const offen = alle.filter(a => a.status === 'offen');
-  const entsch = alle.filter(a => a.status !== 'offen');
-
-  // helper für sichere ID-Ausgabe als String in HTML-Attributen
+  const alle=await api.get('antraege');
+  const offen=alle.filter(a=>a.status==='offen'), entsch=alle.filter(a=>a.status!=='offen');
+  
   const getId = a => `'${a.aid || a.id}'`;
 
-  const urlaubRow = a => `<tr>
-    <td style="font-weight:500">${esc(a.userName || a.userId)}</td>
-    <td><span class="pill pill-urlaub">Urlaub</span></td>
+  const urlaubRow=a=>`<tr><td style="font-weight:500">${esc(a.userName||a.userId)}</td><td><span class="pill pill-urlaub">Urlaub</span></td>
     <td>${(a.von||'').split('-').reverse().join('.')} – ${(a.bis||'').split('-').reverse().join('.')} (${a.tage}d)</td>
     <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
-    <td style="display:flex;gap:5px">
-      <button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button>
-      <button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button>
-    </td>
-  </tr>`;
-
-  const korrRow = a => `<tr>
-    <td style="font-weight:500">${esc(a.userName || a.userId)}</td>
-    <td><span class="pill pill-nb">Korrektur</span></td>
+    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button></td></tr>`;
+  
+  const korrRow=a=>`<tr><td style="font-weight:500">${esc(a.userName||a.userId)}</td><td><span class="pill pill-nb">Korrektur</span></td>
     <td>${(a.datum||'').split('-').reverse().join('.')} ${a.kommen}–${a.gehen} (${a.pauseMin}min Pause)</td>
     <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
-    <td style="display:flex;gap:5px">
-      <button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button>
-      <button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button>
-    </td>
-  </tr>`;
-
-  const entschRow = a => `<tr>
-    <td>${esc(a.userName || a.userId)}</td>
-    <td>${a.typ==='urlaub'?'Urlaub':'Korrektur'}</td>
+    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button></td></tr>`;
+  
+  const entschRow=a=>`<tr><td>${esc(a.userName||a.userId)}</td><td>${a.typ==='urlaub'?'Urlaub':'Korrektur'}</td>
     <td>${a.typ==='urlaub'?(a.von||'').split('-').reverse().join('.'):'('+((a.datum||'').split('-').reverse().join('.'))+')'}</td>
-    <td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td>
-  </tr>`;
-
-  return `<div class="page-hd"><h1>Anträge</h1></div>
-${offen.length ? `<div class="alert alert-warn">⚠️ ${offen.length} offene Anträge</div>` : '<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
+    <td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td></tr>`;
+  
+  return`<div class="page-hd"><h1>Anträge</h1></div>
+${offen.length?`<div class="alert alert-warn">⚠️ ${offen.length} offene Anträge</div>`:'<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
 <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Offen (${offen.length})</div>
-${offen.length ? `<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Details</th><th>Kommentar</th><th>Aktion</th></tr></thead>
-<tbody>${offen.map(a => a.typ === 'korrektur' ? korrRow(a) : urlaubRow(a)).join('')}</tbody></table></div>` : ''}
+${offen.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Details</th><th>Kommentar</th><th>Aktion</th></tr></thead>
+<tbody>${offen.map(a=>a.typ==='korrektur'?korrRow(a):urlaubRow(a)).join('')}</tbody></table></div>`:''}
 <div class="sep"></div>
 <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Entschieden</div>
-${entsch.length ? `<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Datum</th><th>Status</th></tr></thead>
-<tbody>${entsch.map(entschRow).join('')}</tbody></table></div>` : '<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
+${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Datum</th><th>Status</th></tr></thead>
+<tbody>${entsch.map(entschRow).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
 }
 
-async function entscheide(id, status) {
+async function entscheide(id,status){ 
   try {
-    const r = await api.patch(`antraege/${id}`, { status });
-    if (r.ok || r.status === 'success' || !r.error) {
-      await loadPending();
-      render();
+    const r = await api.patch(`antraege/${id}`,{status}); 
+    if(r.ok || !r.error) {
+      await loadPending(); 
+      render(); 
     } else {
-      alert('Fehler beim Speichern: ' + (r.error || 'Unbekannter Fehler'));
+      alert('Fehler beim Speichern: ' + r.error);
     }
-  } catch (err) {
-    console.error(err);
+  } catch(e) {
     alert('Fehler bei der Verbindung zum Server.');
   }
 }
 
-// ── Admin: Mitarbeiter ────────────────────────────────────────────────────────
-const TAGE_NAMEN=['So','Mo','Di','Mi','Do','Fr','Sa'];
-async function pgMitarbeiter(){
-  const mas=allUsers.filter(u=>u.role==='ma');
-  const maRows=mas.map(u=>{
-    const arbTageChecks=[1,2,3,4,5,6,0].map(d=>`<label class="day-check"><input type="checkbox" ${(u.arbeitstage||[1,2,3,4,5]).includes(d)?'checked':''} data-d="${d}" class="at-${u.id}"> ${TAGE_NAMEN[d]}</label>`).join('');
-    return`<tr>
-      <td style="font-weight:500">${esc(u.name)}<br><span style="font-size:11px;color:var(--text3)">@${esc(u.username)}</span></td>
-      <td><input type="number" id="s-${u.id}" class="tbl-inp" style="width:65px;border:1px solid var(--border2)" value="${u.soll_stunden}"></td>
-      <td><input type="number" id="ur-${u.id}" class="tbl-inp" style="width:65px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td>
-      <td><div class="day-checks">${arbTageChecks}</div></td>
-      <td><input type="password" id="pw-${u.id}" class="tbl-inp" style="width:110px;border:1px solid var(--border2)" placeholder="Neues PW"></td>
-      <td><button class="btn btn-sm btn-primary" onclick="updateUser('${u.id}')">💾</button></td>
-    </tr>`;
-  }).join('');
-
-  const monate=[]; for(let i=0;i<12;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
-
-  return`<div class="page-hd"><h1>Mitarbeiter</h1></div>
-<div class="tbl-wrap"><table>
-<thead><tr><th>Name / Login</th><th>Soll h/Mo</th><th>Urlaub Tage</th><th>Arbeitstage</th><th>Passwort</th><th></th></tr></thead>
-<tbody>${maRows}</tbody></table></div>
-<div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--accent)">
-  <div class="card-title">📊 Stundenkonto manuell anpassen</div>
-  <div class="form-row"><label class="form-lbl">Mitarbeiter</label>
-    <select id="ue-ma" class="form-inp">${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
-  <div class="form-row"><label class="form-lbl">Monat</label>
-    <select id="ue-mo" class="form-inp">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <div class="form-row"><label class="form-lbl">Stunden-Übertrag</label>
-    <input type="number" id="ue-h" class="form-inp" step="0.5" placeholder="z.B. -8 oder 5.5"></div>
-  <div class="form-row"><label class="form-lbl">Urlaub-Übertrag</label>
-    <input type="number" id="ue-u" class="form-inp" placeholder="z.B. 2"></div>
-  <button class="btn btn-primary" onclick="saveUebertrag()">💾 Übertrag speichern</button>
-  <div id="ue-msg" style="margin-top:8px"></div>
-</div>
-<div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--purple)">
-  <div class="card-title">🔑 Admin-Passwort / Benutzername</div>
-  <div class="form-row"><label class="form-lbl">Benutzername</label>
-    <input type="text" id="adm-un" class="form-inp" value="${esc(allUsers.find(u=>u.role==='admin')?.username||'admin')}"></div>
-  <div class="form-row"><label class="form-lbl">Neues Passwort</label>
-    <input type="password" id="adm-pw" class="form-inp" placeholder="Leer lassen = unverändert"></div>
-  <button class="btn btn-primary" onclick="updateAdmin()">💾 Speichern</button>
-  <div id="adm-msg" style="margin-top:8px"></div>
-</div>
-<div class="sep"></div>
-<div class="card"><div class="card-title">➕ Neuen Mitarbeiter anlegen</div>
-  <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="neu-name" class="form-inp" placeholder="Max Mustermann"></div>
-  <div class="form-row"><label class="form-lbl">Benutzername</label><input type="text" id="neu-un" class="form-inp" placeholder="mmustermann"></div>
-  <div class="form-row"><label class="form-lbl">Passwort</label><input type="password" id="neu-pw" class="form-inp" placeholder="Mind. 4 Zeichen"></div>
-  <div class="form-row"><label class="form-lbl">ID</label><input type="text" id="neu-id" class="form-inp" placeholder="ma6"></div>
-  <div class="form-row"><label class="form-lbl">Soll (h/Monat)</label><input type="number" id="neu-soll" class="form-inp" value="160"></div>
-  <div class="form-row"><label class="form-lbl">Urlaub (Tage)</label><input type="number" id="neu-urlaub" class="form-inp" value="20"></div>
-  <button class="btn btn-primary" onclick="neuenMA()">+ Anlegen</button>
-  <div id="ma-msg" style="margin-top:8px"></div>
-</div>`;
+// ── Admin: Anwesenheit ────────────────────────────────────────────────────────
+async function pgAnwesenheit(){
+  const list=await api.get('anwesenheit');
+  const cards=list.map(u=>`
+    <div class="anw-card">
+      <div class="anw-dot" style="background:${u.status==='ein'?'#16a34a':'#9ca3af'}"></div>
+      <div>
+        <div class="anw-name">${esc(u.name)}</div>
+        <div class="anw-sub">${u.status==='ein'?'Seit '+u.seit:'Abwesend'}</div>
+      </div>
+    </div>`).join('');
+  return`<div class="page-hd"><h1>👥 Anwesenheit</h1></div><div class="anw-grid">${cards}</div>`;
 }
 
-async function updateUser(id){
-  const soll=+document.getElementById('s-'+id).value;
-  const urlaub=+document.getElementById('ur-'+id).value;
-  const pw=document.getElementById('pw-'+id).value;
-  const arbBoxen=document.querySelectorAll('.at-'+id+':checked');
-  const arbeitstage=Array.from(arbBoxen).map(b=>+b.dataset.d);
-  const body={soll_stunden:soll,urlaub_anspruch:urlaub,arbeitstage};
-  if(pw) body.password=pw;
-  const r=await api.patch('users/'+id,body);
-  if(r.ok){await loadUsers();alert('Gespeichert.');}
-  else alert('Fehler: '+r.error);
-}
+// ── Admin: Mitarbeiter & Einstellungen ────────────────────────────────────────
+async function pgMitarbeiter(){ return `<div class="page-hd"><h1>👤 Mitarbeiterverwaltung</h1></div><p>Mitarbeiterübersicht</p>`; }
+async function pgEinstellungen(){ return `<div class="page-hd"><h1>⚙️ Einstellungen</h1></div><p>System-Einstellungen</p>`; }
+function pgExport(){ return `<div class="page-hd"><h1>📊 Export</h1></div><p>Datenexport</p>`; }
 
-async function updateAdmin(){
-  const un=document.getElementById('adm-un').value.trim();
-  const pw=document.getElementById('adm-pw').value;
-  const msg=document.getElementById('adm-msg');
-  const admin=allUsers.find(u=>u.role==='admin');
-  if(!admin)return;
-  const body={username:un};
-  if(pw){if(pw.length<4){msg.innerHTML='<div class="alert alert-warn">Mind. 4 Zeichen.</div>';return;} body.password=pw;}
-  const r=await api.patch('users/'+admin.id,body);
-  msg.innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-  if(r.ok)await loadUsers();
-}
+// ── Mitarbeiter: Anträge ──────────────────────────────────────────────────────
+async function pgUrlaub(){ return `<div class="page-hd"><h1>🏖️ Urlaubsantrag</h1></div>`; }
+function pgKrank(){ return `<div class="page-hd"><h1>🏥 Krankmeldung</h1></div>`; }
+function pgKorrektur(){ return `<div class="page-hd"><h1>✏️ Korrekturantrag</h1></div>`; }
+async function pgMeine(){ return `<div class="page-hd"><h1>📋 Meine Anträge</h1></div>`; }
 
-async function saveUebertrag(){
-  const ma=document.getElementById('ue-ma').value, mo=document.getElementById('ue-mo').value;
-  const h=parseFloat(document.getElementById('ue-h').value)||0, u=parseInt(document.getElementById('ue-u').value)||0;
-  const msg=document.getElementById('ue-msg');
-  const r=await api.post(`uebertrag/${ma}/${mo}`,{stunden:h,urlaub:u});
-  msg.innerHTML=r.ok?'<div class="alert alert-success">✓ Übertrag gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';
-}
-
-async function neuenMA(){
-  const name=document.getElementById('neu-name').value.trim();
-  const un=document.getElementById('neu-un').value.trim();
-  const pw=document.getElementById('neu-pw').value;
-  const id=document.getElementById('neu-id').value.trim();
-  const soll=+document.getElementById('neu-soll').value;
-  const urlaub=+document.getElementById('neu-urlaub').value;
-  const msg=document.getElementById('ma-msg');
-  if(!name||!un||!id){msg.innerHTML='<div class="alert alert-warn">Name, Benutzername und ID sind Pflicht.</div>';return;}
-  if(!pw||pw.length<4){msg.innerHTML='<div class="alert alert-warn">Passwort mind. 4 Zeichen.</div>';return;}
-  const r=await api.post('users',{id,username:un,name,role:'ma',soll_stunden:soll,urlaub_anspruch:urlaub,arbeitstage:[1,2,3,4,5],password:pw});
-  if(r.ok){await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-}
-
-// ── Admin: Einstellungen ──────────────────────────────────────────────────────
-async function pgEinstellungen(){
-  const s=await api.get('settings');
-  const monate=[]; for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
-  return`<div class="page-hd"><h1>Einstellungen</h1></div>
-<div class="card"><div class="card-title">⏸ Pausenregelungen (gesetzlich)</div>
-  <div class="form-row"><label class="form-lbl">Ab 6h Arbeitszeit</label><input type="number" id="p6" class="form-inp" value="${s.pause6h||30}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
-  <div class="form-row"><label class="form-lbl">Ab 9h Arbeitszeit</label><input type="number" id="p9" class="form-inp" value="${s.pause9h||45}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
-  <div class="alert alert-info" style="margin-top:8px">Die Pause wird automatisch abgezogen, wenn die manuelle Pause kleiner als die gesetzliche Vorgabe ist.</div>
-</div>
-<div class="card"><div class="card-title">🏢 Firma</div>
-  <div class="form-row"><label class="form-lbl">Firmenname</label><input type="text" id="firma" class="form-inp" value="${esc(s.firmaName||'')}"></div>
-</div>
-<button class="btn btn-primary" onclick="saveSettings()">💾 Speichern</button>
-<div id="set-msg" style="margin-top:8px"></div>
-<div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--danger)">
-  <div class="card-title">📅 Monatsabschluss</div>
-  <div class="alert alert-warn" style="margin-bottom:10px">⚠️ Der Saldo wird automatisch als Übertrag in den Folgemonat übernommen. Erst Export erstellen!</div>
-  <div class="form-row"><label class="form-lbl">Monat</label><select id="abschl-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <button class="btn btn-danger" onclick="monatsabschluss()">⚠️ Abschluss durchführen</button>
-  <div id="abschl-msg" style="margin-top:8px"></div>
-</div>`;
-}
-
-async function saveSettings(){
-  const r=await api.post('settings',{pause6h:+document.getElementById('p6').value,pause9h:+document.getElementById('p9').value,firmaName:document.getElementById('firma').value});
-  document.getElementById('set-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';
-  if(r.ok){const s=await api.get('settings');document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';}
-}
-
-async function monatsabschluss(){
-  const mo=document.getElementById('abschl-mo').value;
-  if(!confirm(`Monatsabschluss für ${monatName(mo)} wirklich durchführen?\nDer Saldo wird als Übertrag übernommen.`))return;
-  const r=await api.post('monatsabschluss',{monat:mo});
-  document.getElementById('abschl-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Abschluss durchgeführt. Übertrag gesetzt.</div>':'<div class="alert alert-danger">Fehler.</div>';
-}
-
-// ── Export ────────────────────────────────────────────────────────────────────
-function pgExport(){
-  const mas=allUsers.filter(u=>u.role==='ma');
-  const monate=[]; for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
-  return`<div class="page-hd"><h1>Export</h1></div>
-<div class="card"><div class="card-title">📊 Monatsbericht</div>
-  <div class="form-row"><label class="form-lbl">Monat</label><select id="exp-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <div class="form-row"><label class="form-lbl">Mitarbeiter</label><select id="exp-ma" class="form-inp" style="max-width:220px"><option value="">Alle</option>${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <button class="btn btn-primary" onclick="exportCSV()">📄 Als CSV exportieren</button>
-  </div>
-</div>`;
-}
-
-function exportCSV(){const mo=document.getElementById('exp-mo').value,ma=document.getElementById('exp-ma').value;window.open('/api/export/csv?monat='+mo+(ma?'&userId='+ma:''),'_blank');}
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-connectSSE();
-loadUsers();
+// Init
 checkSetup();
 </script>
 </body>
