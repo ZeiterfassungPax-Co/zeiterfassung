@@ -39,8 +39,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge{margin-left:auto;font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;border-radius:8px;font-weight:600}
 
 /* ── Buttons & Inputs ── */
-input[type=text],input[type=password],input[type=date],input[type=time],input[type=number],select{padding:6px 8px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit}
-input:focus,select:focus{outline:none;border-color:var(--accent)}
+input[type=text],input[type=password],input[type=date],input[type=time],input[type=number],textarea,select{padding:6px 8px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn:hover{background:var(--bg)}
 .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -50,17 +50,13 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
 .btn-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
 
-/* ── Cards ── */
+/* ── Cards & Stats ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
-.card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px}
-
-/* ── Stats ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 @media(max-width:700px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
 .stat-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
 .stat-val{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
 .stat-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:6px}
 .stat-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
 .stat-bar-fill.over{background:var(--danger)}
@@ -73,24 +69,16 @@ th{text-align:left;padding:7px 10px;font-size:11px;font-weight:600;color:var(--t
 td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
-.tbl-inp{width:100%;padding:3px 6px;font-size:12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit}
-.tbl-inp:hover{border-color:var(--border)}.tbl-inp:focus{outline:none;border-color:var(--accent);background:var(--surface)}
 
-/* ── Pills ── */
+/* ── Pills & Alerts ── */
 .pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
 .pill-ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
 .pill-krank{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
 .pill-urlaub{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
-.pill-offen{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-.pill-fehler{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
 .pill-nb{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-
-/* ── Alerts ── */
 .alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:12px}
-.alert-info{background:var(--accent-bg);color:var(--accent-text);border:1px solid #bfdbfe}
 .alert-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
 .alert-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-.alert-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
 
 /* ── Stempel ── */
 .stamp-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
@@ -132,12 +120,12 @@ tbody tr:hover{background:var(--surface2)}
 
 /* ── Modal ── */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--surface);border-radius:10px;padding:24px;width:420px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal{background:var(--surface);border-radius:10px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
 .modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
 .form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.form-lbl{font-size:13px;color:var(--text2);min-width:110px}
-.form-inp{flex:1;max-width:260px}
+.form-lbl{font-size:13px;color:var(--text2);min-width:120px}
+.form-inp{flex:1;max-width:300px}
 
 /* ── Login / Setup ── */
 .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200}
@@ -150,36 +138,30 @@ tbody tr:hover{background:var(--surface2)}
 .login-btn:hover{background:#1d4ed8}
 .login-err{color:var(--danger);font-size:12px;margin-top:10px;min-height:18px;text-align:center}
 
-/* ── MA Chips ── */
+/* ── MA Chips & Anwesenheit ── */
 .ma-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .ma-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
 .ma-chip.act{background:var(--accent);color:#fff;border-color:var(--accent)}
-
-/* ── Anwesenheits-Grid ── */
-.anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
-.anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:12px}
 .anw-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.anw-name{font-size:13px;font-weight:500}.anw-sub{font-size:11px;color:var(--text3)}
+.anw-name{font-size:13px;font-weight:600}.anw-sub{font-size:11px;color:var(--text3)}
 
-/* ── Page Header ── */
+/* ── Page Header & Layout Helpers ── */
 .page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
 .page-hd h1{font-size:16px;font-weight:600}
 .sep{height:1px;background:var(--border);margin:16px 0}
-
-/* ── Checkboxen für Arbeitstage ── */
-.day-checks{display:flex;gap:8px;flex-wrap:wrap}
-.day-check{display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer}
+.form-card{max-width:550px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px}
 </style>
 </head>
 <body>
 
-<!-- Setup-Screen (Ersteinrichtung) -->
+<!-- Setup-Screen -->
 <div class="login-overlay" id="setup-screen" style="display:none">
   <div class="login-box">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     <h2>Ersteinrichtung</h2>
     <p>Admin-Passwort festlegen</p>
-    <input class="login-field" id="setup-pw"  type="password" placeholder="Admin-Passwort" onkeydown="if(event.key==='Enter')document.getElementById('setup-pw2').focus()">
+    <input class="login-field" id="setup-pw" type="password" placeholder="Admin-Passwort">
     <input class="login-field" id="setup-pw2" type="password" placeholder="Passwort wiederholen" onkeydown="if(event.key==='Enter')doSetup()">
     <button class="login-btn" style="background:var(--purple)" onclick="doSetup()">Passwort speichern</button>
     <div class="login-err" id="setup-err"></div>
@@ -189,11 +171,10 @@ tbody tr:hover{background:var(--surface2)}
 <!-- Login-Screen -->
 <div class="login-overlay" id="login-screen">
   <div class="login-box">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     <h2>Zeiterfassung</h2>
     <p>Bitte anmelden</p>
-    <input class="login-field" id="login-user" type="text"     placeholder="Benutzername" autocomplete="username"         onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
-    <input class="login-field" id="login-pw"   type="password" placeholder="Passwort"     autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <input class="login-field" id="login-user" type="text" placeholder="Benutzername">
+    <input class="login-field" id="login-pw" type="password" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Anmelden</button>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -211,7 +192,7 @@ tbody tr:hover{background:var(--surface2)}
   </div>
   <div class="body">
     <div class="sidebar" id="sidebar"></div>
-    <div class="main"    id="main"></div>
+    <div class="main" id="main"></div>
   </div>
 </div>
 
@@ -221,37 +202,35 @@ tbody tr:hover{background:var(--surface2)}
 </div>
 
 <script>
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const pad    = n => String(n).padStart(2,'0');
-const fmtT   = d => pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-const fmtD   = d => pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
-const today  = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
-const monat  = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); };
+// ── Helpers ──
+const pad = n => String(n).padStart(2,'0');
+const fmtT = d => pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+const fmtD = d => pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
+const today = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+const monat = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); };
 const monatName = mk => { const[y,m]=mk.split('-'); return ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][+m-1]+' '+y; };
-const esc    = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fmtH   = h => { if(h===null||h===undefined)return'—'; const neg=h<0; h=Math.abs(h); const hi=Math.floor(h),mi=Math.round((h-hi)*60); return(neg?'-':'')+hi+'h '+pad(mi)+'m'; };
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtH = h => { if(h===null||h===undefined)return'—'; const neg=h<0; h=Math.abs(h); const hi=Math.floor(h),mi=Math.round((h-hi)*60); return(neg?'-':'')+hi+'h '+pad(mi)+'m'; };
 
 const api = {
-  get:   url         => fetch('/api/'+url).then(r=>r.json()),
-  post:  (url,data)  => fetch('/api/'+url,{method:'POST',  headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  patch: (url,data)  => fetch('/api/'+url,{method:'PATCH', headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  del:   url         => fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
+  get: url => fetch('/api/'+url).then(r=>r.json()),
+  post: (url,data) => fetch('/api/'+url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  patch: (url,data) => fetch('/api/'+url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
+  del: url => fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
 };
 
 let CU=null, page='kalender', allUsers=[], pending=0, clockInt=null, sse=null;
 let adminSelMa=null, calMonat=monat();
 
-// ── SSE ───────────────────────────────────────────────────────────────────────
 function connectSSE(){
   if(sse)sse.close();
   sse=new EventSource('/api/events');
   ['buchung','nachbuchung','loeschung'].forEach(e=>sse.addEventListener(e,()=>{ if(['kalender','buchen','anwesenheit'].includes(page))render(); }));
-  ['antrag_neu','antrag_update'].forEach(e=>sse.addEventListener(e,()=>{ loadPending(); if(['antraege','kalender'].includes(page))render(); }));
+  ['antrag_neu','antrag_update'].forEach(e=>sse.addEventListener(e,()=>{ loadPending(); if(['antraege','kalender','meine-antraege'].includes(page))render(); }));
   sse.addEventListener('user_update',()=>loadUsers().then(()=>render()));
   sse.onerror=()=>setTimeout(connectSSE,5000);
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
 async function checkSetup(){
   const r=await api.get('setup/needed');
   if(r.needed){
@@ -265,14 +244,13 @@ async function doSetup(){
   const pw2=document.getElementById('setup-pw2').value;
   const err=document.getElementById('setup-err');
   err.textContent='';
-  if(pw.length<4){err.textContent='Mind. 4 Zeichen erforderlich.';return;}
-  if(pw!==pw2){err.textContent='Passwörter stimmen nicht überein.';return;}
+  if(pw.length<4){err.textContent='Mind. 4 Zeichen.';return;}
+  if(pw!==pw2){err.textContent='Passwörter ungleich.';return;}
   const r=await api.post('setup',{password:pw});
   if(r.ok){
     document.getElementById('setup-screen').style.display='none';
     document.getElementById('login-screen').style.display='flex';
     document.getElementById('login-user').value='admin';
-    document.getElementById('login-pw').focus();
   } else { err.textContent=r.error||'Fehler.'; }
 }
 
@@ -281,47 +259,35 @@ async function doLogin(){
   const password=document.getElementById('login-pw').value;
   const err=document.getElementById('login-err');
   err.textContent='';
-  if(!username||!password){err.textContent='Bitte Benutzername und Passwort eingeben.';return;}
+  if(!username||!password){err.textContent='Bitte Felder ausfüllen.';return;}
   const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
   const data=await r.json();
-  if(!r.ok){err.textContent=data.error||'Anmeldung fehlgeschlagen.';return;}
+  if(!r.ok){err.textContent=data.error||'Login fehlgeschlagen.';return;}
   CU=data.user;
   await loadUsers();
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
   document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
-  document.getElementById('login-pw').value='';
   calMonat=monat();
-  page=CU.role==='admin'?'anwesenheit':'kalender';
+  page=CU.role==='admin'?'anwesenheit':'buchen';
   adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
   await loadPending();
-  const s=await api.get('settings');
-  document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';
   connectSSE();
   render();
 }
 
 function logout(){
-  CU=null;
-  if(sse) sse.close();
-  document.getElementById('login-user').value='';
-  document.getElementById('login-pw').value='';
-  document.getElementById('login-err').textContent='';
+  CU=null; if(sse) sse.close();
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
 
-// ── Data Loading ──────────────────────────────────────────────────────────────
 async function loadUsers(){ allUsers=await api.get('users'); }
 async function loadPending(){ 
-  try {
-    const a=await api.get('antraege'); 
-    pending=Array.isArray(a)?a.filter(x=>x.status==='offen').length:0; 
-  } catch(e) { pending=0; }
+  try { const a=await api.get('antraege'); pending=Array.isArray(a)?a.filter(x=>x.status==='offen').length:0; } catch(e){ pending=0; }
   renderSidebar(); 
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────────
 function renderSidebar(){
   if(!CU)return;
   const isAdmin=CU.role==='admin', p=page;
@@ -333,9 +299,6 @@ function renderSidebar(){
     <div class="sb-section">Verwaltung</div>
     <button ${sb('antraege')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
     <button ${sb('mitarbeiter')}>👤 Mitarbeiter</button>
-    <button ${sb('einstellungen')}>⚙️ Einstellungen</button>
-    <div class="sb-section">Auswertung</div>
-    <button ${sb('export')}>📊 Export</button>
   `:`
     <div class="sb-section">Zeiterfassung</div>
     <button ${sb('buchen')}>⏱️ Buchen</button>
@@ -351,29 +314,25 @@ function renderSidebar(){
 
 function nav(p){page=p;render();}
 
-// ── Render ────────────────────────────────────────────────────────────────────
 async function render(){
   renderSidebar();
   const el=document.getElementById('main');
   el.innerHTML='<div style="padding:20px;color:var(--text3)">Lade…</div>';
   try{
-    const isAdmin=CU?.role==='admin';
-    if(isAdmin){
+    if(CU.role==='admin'){
       if(page==='anwesenheit')     el.innerHTML=await pgAnwesenheit();
       else if(page==='kalender')   el.innerHTML=await pgKalender(adminSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id, true);
       else if(page==='antraege')   el.innerHTML=await pgAntraege();
       else if(page==='mitarbeiter')el.innerHTML=await pgMitarbeiter();
-      else if(page==='einstellungen')el.innerHTML=await pgEinstellungen();
-      else el.innerHTML=pgExport();
     } else {
       if(page==='buchen')        el.innerHTML=await pgBuchen();
       else if(page==='kalender') el.innerHTML=await pgKalender(CU.id, false);
-      else if(page==='urlaub')   el.innerHTML=await pgUrlaub();
+      else if(page==='urlaub')   el.innerHTML=pgUrlaub();
       else if(page==='krank')    el.innerHTML=pgKrank();
       else if(page==='korrektur')el.innerHTML=pgKorrektur();
       else if(page==='meine-antraege')el.innerHTML=await pgMeine();
     }
-  }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${esc(e.message)}</div>`;}
+  }catch(e){el.innerHTML=`<div class="alert alert-warn">Fehler: ${esc(e.message)}</div>`;}
   startClock();
 }
 
@@ -383,11 +342,115 @@ function startClock(){
   tick(); clockInt=setInterval(tick,1000);
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
 function openModal(html){ document.getElementById('modal-content').innerHTML=html; document.getElementById('modal-bg').style.display='flex'; }
 function closeModal(){ document.getElementById('modal-bg').style.display='none'; }
 
-// ── Kalender-Typ-Konfiguration ────────────────────────────────────────────────
+// ── Admin: Mitarbeiterverwaltung ──
+async function pgMitarbeiter(){
+  await loadUsers();
+  const rows = allUsers.map(u=>`
+    <tr>
+      <td style="font-weight:600">${esc(u.name)}</td>
+      <td style="color:var(--text2)">${esc(u.username)}</td>
+      <td><span class="pill ${u.role==='admin'?'pill-urlaub':'pill-ok'}">${u.role==='admin'?'Admin':'Mitarbeiter'}</span></td>
+      <td>${u.wochenstunden||40} Std.</td>
+      <td>${u.urlaubTage||30} Tage</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="modalUserEdit('${u.id}')">✏️ Bearbeiten</button>
+        ${u.role!=='admin'?`<button class="btn btn-sm btn-danger" onclick="adminDeleteUser('${u.id}','${esc(u.name)}')">🗑️</button>`:''}
+      </td>
+    </tr>
+  `).join('');
+
+  return `
+    <div class="page-hd">
+      <h1>👤 Mitarbeiterverwaltung</h1>
+      <button class="btn btn-primary" onclick="modalUserNew()">+ Neuer Mitarbeiter</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Benutzername</th>
+            <th>Rolle</th>
+            <th>Soll / Woche</th>
+            <th>Jahresurlaub</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function modalUserNew(){
+  openModal(`
+    <h3>Neuen Mitarbeiter anlegen</h3>
+    <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="nu-name" class="form-inp"></div>
+    <div class="form-row"><label class="form-lbl">Benutzername</label><input type="text" id="nu-user" class="form-inp"></div>
+    <div class="form-row"><label class="form-lbl">Passwort</label><input type="password" id="nu-pw" class="form-inp"></div>
+    <div class="form-row"><label class="form-lbl">Soll h/Woche</label><input type="number" id="nu-std" class="form-inp" value="40"></div>
+    <div class="form-row"><label class="form-lbl">Urlaubstage/Jahr</label><input type="number" id="nu-url" class="form-inp" value="30"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveNewUser()">Speichern</button>
+    </div>
+  `);
+}
+
+async function saveNewUser(){
+  const name=document.getElementById('nu-name').value;
+  const username=document.getElementById('nu-user').value;
+  const password=document.getElementById('nu-pw').value;
+  const wochenstunden=+document.getElementById('nu-std').value||40;
+  const urlaubTage=+document.getElementById('nu-url').value||30;
+  if(!name||!username||!password){alert('Bitte alle Pflichtfelder ausfüllen.');return;}
+  
+  const r=await api.post('users',{name,username,password,wochenstunden,urlaubTage,role:'ma'});
+  if(r.ok||r.id){ closeModal(); await loadUsers(); render(); }
+  else alert('Fehler: '+(r.error||'Konnte nicht gespeichert werden'));
+}
+
+function modalUserEdit(id){
+  const u = allUsers.find(x=>x.id===id);
+  if(!u) return;
+  openModal(`
+    <h3>Mitarbeiter bearbeiten: ${esc(u.name)}</h3>
+    <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="eu-name" class="form-inp" value="${esc(u.name)}"></div>
+    <div class="form-row"><label class="form-lbl">Soll h/Woche</label><input type="number" id="eu-std" class="form-inp" value="${u.wochenstunden||40}"></div>
+    <div class="form-row"><label class="form-lbl">Urlaubstage/Jahr</label><input type="number" id="eu-url" class="form-inp" value="${u.urlaubTage||30}"></div>
+    <div class="form-row"><label class="form-lbl">Neues Passwort</label><input type="password" id="eu-pw" class="form-inp" placeholder="leer lassen für unverändert"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveEditUser('${u.id}')">Änderungen speichern</button>
+    </div>
+  `);
+}
+
+async function saveEditUser(id){
+  const name=document.getElementById('eu-name').value;
+  const wochenstunden=+document.getElementById('eu-std').value||40;
+  const urlaubTage=+document.getElementById('eu-url').value||30;
+  const password=document.getElementById('eu-pw').value;
+
+  const data={name,wochenstunden,urlaubTage};
+  if(password) data.password=password;
+
+  const r=await api.patch(`users/${id}`,data);
+  if(r.ok||!r.error){ closeModal(); await loadUsers(); render(); }
+  else alert('Fehler: '+(r.error||'Speichern fehlgeschlagen'));
+}
+
+async function adminDeleteUser(id, name){
+  if(!confirm(`Mitarbeiter "${name}" wirklich löschen?`)) return;
+  const r=await api.del(`users/${id}`);
+  if(r.ok||!r.error){ await loadUsers(); render(); }
+  else alert('Fehler beim Löschen');
+}
+
+// ── Kalender ──
 const tagConfig = {
   normal: {label:'Anwesend', cls:'cal-tag-normal'},
   aktiv:  {label:'Aktiv',    cls:'cal-tag-aktiv'},
@@ -398,33 +461,32 @@ const tagConfig = {
   offen:  {label:'',         cls:'cal-tag-offen'},
 };
 
-// ── Kalender-Seite ────────────────────────────────────────────────────────────
 async function pgKalender(userId, isAdmin){
   const selId = userId || CU.id;
-  const mas   = allUsers.filter(u=>u.role==='ma');
-  const d     = await api.get(`journal/${selId}?monat=${calMonat}`);
+  const mas = allUsers.filter(u=>u.role==='ma');
+  const d = await api.get(`journal/${selId}?monat=${calMonat}`);
   const {tage=[], konten:kn={istH:0,saldo:0,uebertragStunden:0,krank:0,fehler:0,urlaubRest:0}} = d;
   const tageByDate = {};
   tage.forEach(t=>tageByDate[t.date]=t);
 
   const [year,mon] = calMonat.split('-').map(Number);
-  const firstDow   = (new Date(year,mon-1,1).getDay()+6)%7;
-  const daysInMon  = new Date(year,mon,0).getDate();
-  const todayStr   = today();
-  const user       = allUsers.find(u=>u.id===selId);
+  const firstDow = (new Date(year,mon-1,1).getDay()+6)%7;
+  const daysInMon = new Date(year,mon,0).getDate();
+  const todayStr = today();
+  const user = allUsers.find(u=>u.id===selId);
 
   let cells='';
   for(let i=0;i<firstDow;i++) cells+=`<div class="cal-day empty"></div>`;
   for(let day=1;day<=daysInMon;day++){
-    const ds  = `${calMonat}-${pad(day)}`;
-    const t   = tageByDate[ds];
+    const ds = `${calMonat}-${pad(day)}`;
+    const t = tageByDate[ds];
     const isT = ds===todayStr;
     const cfg = t ? (tagConfig[t.typ]||tagConfig.offen) : tagConfig.offen;
     const lbl = t ? cfg.label : '';
     let info='';
     if(t && t.typ==='normal'&&t.ein) info=`<div class="cal-time">${t.ein}–${t.aus||'?'}<br>${t.netto!==null?fmtH(t.netto):''}</div>`;
     if(t && t.typ==='aktiv' &&t.ein) info=`<div class="cal-time">${t.ein}–laufend</div>`;
-    if(t && t.typ==='fehler')        info=`<div class="cal-time" style="color:var(--orange)">${esc(t.kommentar)}</div>`;
+    if(t && t.typ==='fehler') info=`<div class="cal-time" style="color:var(--orange)">${esc(t.kommentar)}</div>`;
     cells+=`<div class="cal-day${isT?' today':''}" onclick="calTagClick('${ds}','${selId}',${isAdmin})">
       <div class="cal-dn">${day}</div>
       ${lbl?`<span class="cal-tag ${cfg.cls}">${lbl}</span>`:''}
@@ -433,7 +495,6 @@ async function pgKalender(userId, isAdmin){
   }
 
   const chipHtml = isAdmin ? `<div class="ma-chips">${mas.map(m=>`<div class="ma-chip${selId===m.id?' act':''}" onclick="adminSelMa='${m.id}';calMonat='${calMonat}';render()">${esc(m.name)}</div>`).join('')}</div>` : '';
-
   const prevM = prevMonat(calMonat), nextM = nextMonat(calMonat);
 
   return`
@@ -447,13 +508,6 @@ ${chipHtml}
   <button class="btn btn-sm" onclick="calMonat='${nextM}';render()">${monatName(nextM).split(' ')[0]} ›</button>
   <button class="btn btn-sm" onclick="calMonat='${monat()}';render()">Heute</button>
 </div>
-<div class="cal-legend">
-  <span><span class="leg-dot" style="background:var(--success-bg);border:1px solid var(--success-border)"></span>Anwesend</span>
-  <span><span class="leg-dot" style="background:var(--purple-bg);border:1px solid var(--purple-border)"></span>Urlaub</span>
-  <span><span class="leg-dot" style="background:var(--danger-bg);border:1px solid var(--danger-border)"></span>Krank</span>
-  <span><span class="leg-dot" style="background:var(--orange-bg);border:1px solid var(--orange-border)"></span>Fehler</span>
-  <span><span class="leg-dot" style="background:var(--bg)"></span>Frei</span>
-</div>
 <div class="cal-grid">
   <div class="cal-head">Mo</div><div class="cal-head">Di</div><div class="cal-head">Mi</div>
   <div class="cal-head">Do</div><div class="cal-head">Fr</div><div class="cal-head">Sa</div><div class="cal-head">So</div>
@@ -465,28 +519,26 @@ ${chipHtml}
   <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
   <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Übertrag</div><div class="stat-val" style="font-size:18px">${fmtH(kn.uebertragStunden)}</div></div>
   <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Fehler</div><div class="stat-val ${kn.fehler>0?'neg':''}" style="font-size:18px">${kn.fehler}</div></div>
   <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Resturlaub</div><div class="stat-val" style="font-size:18px">${kn.urlaubRest}</div></div>
 </div>`;
 }
 
 function prevMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m-2,1); return d.getFullYear()+'-'+pad(d.getMonth()+1); }
-function nextMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m,1);   return d.getFullYear()+'-'+pad(d.getMonth()+1); }
+function nextMonat(mk){ const[y,m]=mk.split('-').map(Number); const d=new Date(y,m,1); return d.getFullYear()+'-'+pad(d.getMonth()+1); }
 
 async function calTagClick(date, userId, isAdmin){
-  const d    = await api.get(`journal/${userId}?monat=${date.slice(0,7)}`);
-  const tag  = d.tage.find(t=>t.date===date);
+  const d = await api.get(`journal/${userId}?monat=${date.slice(0,7)}`);
+  const tag = d.tage.find(t=>t.date===date);
   const user = allUsers.find(u=>u.id===userId);
-  const ds   = date.split('-').reverse().join('.');
-  const typ  = tag?.typ||'offen';
+  const ds = date.split('-').reverse().join('.');
+  const typ = tag?.typ||'offen';
 
   if(!isAdmin){
     openModal(`<h3>📅 ${ds}</h3>
       <p style="font-size:13px;color:var(--text2);margin-bottom:8px">
         ${typ==='normal'?`Kommen: ${tag.ein} · Gehen: ${tag.aus} · Netto: ${fmtH(tag.netto)}`:
           typ==='krank'?'🏥 Kranktag':typ==='urlaub'?'🏖️ Urlaub':
-          typ==='fehler'?'⚠️ '+esc(tag?.kommentar||'Fehler'):
-          typ==='aktiv'?'Eingestempelt seit '+tag.ein:'Kein Eintrag'}
+          typ==='fehler'?'⚠️ '+esc(tag?.kommentar||'Fehler'):'Kein Eintrag'}
       </p>
       <div class="modal-actions"><button class="btn" onclick="closeModal()">Schließen</button></div>`);
     return;
@@ -494,11 +546,11 @@ async function calTagClick(date, userId, isAdmin){
 
   openModal(`<h3>📅 ${ds} — ${esc(user?.name||'')}</h3>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
-      Aktuell: <strong>${typ==='normal'?`${tag.ein}–${tag.aus} (${fmtH(tag.netto)})`:typ==='fehler'?'⚠️ '+esc(tag.kommentar||'Fehler'):typ==='krank'?'Krank':typ==='urlaub'?'Urlaub':typ==='aktiv'?'Aktiv (eingestempelt)':'Kein Eintrag'}</strong>
+      Aktuell: <strong>${typ==='normal'?`${tag.ein}–${tag.aus}`:typ==='krank'?'Krank':typ==='urlaub'?'Urlaub':'Kein Eintrag'}</strong>
     </div>
     <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="m-k" class="form-inp" value="${tag?.ein||'08:00'}"></div>
     <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="m-g" class="form-inp" value="${tag?.aus||'17:00'}"></div>
-    <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="m-p" class="form-inp" value="${tag?.pauseMin||45}" min="0"></div>
+    <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="m-p" class="form-inp" value="${tag?.pauseMin||45}"></div>
     <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="m-c" class="form-inp" value="${esc(tag?.kommentar||'')}"></div>
     <div class="modal-actions">
       <button class="btn btn-danger" onclick="adminLoeschTag('${userId}','${date}')">🗑 Löschen</button>
@@ -508,20 +560,20 @@ async function calTagClick(date, userId, isAdmin){
 }
 
 async function adminNachbuchen(userId,date){
-  const k=document.getElementById('m-k').value,g=document.getElementById('m-g').value,
-        p=document.getElementById('m-p').value,c=document.getElementById('m-c').value;
-  if(!k||!g){alert('Kommen und Gehen sind Pflicht.');return;}
+  const k=document.getElementById('m-k').value, g=document.getElementById('m-g').value,
+        p=document.getElementById('m-p').value, c=document.getElementById('m-c').value;
+  if(!k||!g){alert('Kommen und Gehen eintragen.');return;}
   const r=await api.post('nachbuchen',{userId,datum:date,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c||'Nachbuchung Admin'});
   if(r.ok){closeModal();render();}else alert('Fehler: '+r.error);
 }
 
 async function adminLoeschTag(userId,date){
-  if(!confirm('Alle Buchungen für diesen Tag löschen?'))return;
+  if(!confirm('Buchungen für diesen Tag löschen?'))return;
   await api.del(`buchungen/${userId}/${date}`);
   closeModal(); render();
 }
 
-// ── Buchen ────────────────────────────────────────────────────────────────────
+// ── Buchen ──
 async function pgBuchen(){
   const mk=monat();
   const[st,jd]=await Promise.all([api.get(`users/${CU.id}/status`),api.get(`journal/${CU.id}?monat=${mk}`)]);
@@ -541,9 +593,8 @@ async function pgBuchen(){
   </div>
 </div>
 <div class="stat-grid">
-  <div class="stat-card"><div class="stat-lbl">Istzeit (Monat)</div><div class="stat-val">${fmtH(kn.istH)}</div><div class="stat-bar"><div class="stat-bar-fill${p>100?' over':''}" style="width:${p}%"></div></div></div>
+  <div class="stat-card"><div class="stat-lbl">Istzeit</div><div class="stat-val">${fmtH(kn.istH)}</div></div>
   <div class="stat-card"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
-  <div class="stat-card"><div class="stat-lbl">Resturlaub</div><div class="stat-val">${kn.urlaubRest} Tage</div></div>
 </div>`;
 }
 
@@ -552,11 +603,10 @@ async function buchen(typ){
   if(r.ok) render(); else alert('Fehler: '+r.error);
 }
 
-// ── Admin: Anträge ────────────────────────────────────────────────────────────
+// ── Admin: Anträge ──
 async function pgAntraege(){
   const alle=await api.get('antraege');
   const offen=alle.filter(a=>a.status==='offen'), entsch=alle.filter(a=>a.status!=='offen');
-  
   const getId = a => `'${a.aid || a.id}'`;
 
   const urlaubRow=a=>`<tr><td style="font-weight:500">${esc(a.userName||a.userId)}</td><td><span class="pill pill-urlaub">Urlaub</span></td>
@@ -565,7 +615,7 @@ async function pgAntraege(){
     <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button></td></tr>`;
   
   const korrRow=a=>`<tr><td style="font-weight:500">${esc(a.userName||a.userId)}</td><td><span class="pill pill-nb">Korrektur</span></td>
-    <td>${(a.datum||'').split('-').reverse().join('.')} ${a.kommen}–${a.gehen} (${a.pauseMin}min Pause)</td>
+    <td>${(a.datum||'').split('-').reverse().join('.')} ${a.kommen}–${a.gehen} (${a.pauseMin}min)</td>
     <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
     <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button></td></tr>`;
   
@@ -587,18 +637,12 @@ ${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th
 async function entscheide(id,status){ 
   try {
     const r = await api.patch(`antraege/${id}`,{status}); 
-    if(r.ok || !r.error) {
-      await loadPending(); 
-      render(); 
-    } else {
-      alert('Fehler beim Speichern: ' + r.error);
-    }
-  } catch(e) {
-    alert('Fehler bei der Verbindung zum Server.');
-  }
+    if(r.ok || !r.error) { await loadPending(); render(); }
+    else alert('Fehler: ' + r.error);
+  } catch(e) { alert('Verbindungsfehler.'); }
 }
 
-// ── Admin: Anwesenheit ────────────────────────────────────────────────────────
+// ── Admin: Anwesenheit ──
 async function pgAnwesenheit(){
   const list=await api.get('anwesenheit');
   const cards=list.map(u=>`
@@ -612,18 +656,85 @@ async function pgAnwesenheit(){
   return`<div class="page-hd"><h1>👥 Anwesenheit</h1></div><div class="anw-grid">${cards}</div>`;
 }
 
-// ── Admin: Mitarbeiter & Einstellungen ────────────────────────────────────────
-async function pgMitarbeiter(){ return `<div class="page-hd"><h1>👤 Mitarbeiterverwaltung</h1></div><p>Mitarbeiterübersicht</p>`; }
-async function pgEinstellungen(){ return `<div class="page-hd"><h1>⚙️ Einstellungen</h1></div><p>System-Einstellungen</p>`; }
-function pgExport(){ return `<div class="page-hd"><h1>📊 Export</h1></div><p>Datenexport</p>`; }
+// ── Mitarbeiter: Anträge ──
+function pgUrlaub(){
+  return `<div class="page-hd"><h1>🏖️ Urlaubsantrag stellen</h1></div>
+  <div class="form-card">
+    <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="u-von" class="form-inp"></div>
+    <div class="form-row"><label class="form-lbl">Bis</label><input type="date" id="u-bis" class="form-inp"></div>
+    <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="u-kom" class="form-inp" placeholder="Optional"></div>
+    <button class="btn btn-primary" style="margin-top:10px" onclick="submitUrlaub()">Antrag einreichen</button>
+  </div>`;
+}
 
-// ── Mitarbeiter: Anträge ──────────────────────────────────────────────────────
-async function pgUrlaub(){ return `<div class="page-hd"><h1>🏖️ Urlaubsantrag</h1></div>`; }
-function pgKrank(){ return `<div class="page-hd"><h1>🏥 Krankmeldung</h1></div>`; }
-function pgKorrektur(){ return `<div class="page-hd"><h1>✏️ Korrekturantrag</h1></div>`; }
-async function pgMeine(){ return `<div class="page-hd"><h1>📋 Meine Anträge</h1></div>`; }
+async function submitUrlaub(){
+  const von=document.getElementById('u-von').value, bis=document.getElementById('u-bis').value, kommentar=document.getElementById('u-kom').value;
+  if(!von||!bis){alert('Bitte Zeitraum angeben.');return;}
+  const r=await api.post('antraege',{typ:'urlaub',von,bis,kommentar});
+  if(r.ok||r.id){ alert('Urlaubsantrag eingereicht!'); nav('meine-antraege'); }
+  else alert('Fehler: '+r.error);
+}
 
-// Init
+function pgKrank(){
+  return `<div class="page-hd"><h1>🏥 Krankmeldung eintragen</h1></div>
+  <div class="form-card">
+    <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="k-von" class="form-inp" value="${today()}"></div>
+    <div class="form-row"><label class="form-lbl">Bis</label><input type="date" id="k-bis" class="form-inp" value="${today()}"></div>
+    <div class="form-row"><label class="form-lbl">Hinweis</label><input type="text" id="k-kom" class="form-inp" placeholder="z.B. AU liegt vor"></div>
+    <button class="btn btn-danger" style="margin-top:10px" onclick="submitKrank()">Krankmeldung absenden</button>
+  </div>`;
+}
+
+async function submitKrank(){
+  const von=document.getElementById('k-von').value, bis=document.getElementById('k-bis').value, kommentar=document.getElementById('k-kom').value;
+  if(!von||!bis){alert('Bitte Datum angeben.');return;}
+  const r=await api.post('antraege',{typ:'krank',von,bis,kommentar});
+  if(r.ok||r.id){ alert('Krankmeldung gespeichert!'); nav('kalender'); }
+  else alert('Fehler: '+r.error);
+}
+
+function pgKorrektur(){
+  return `<div class="page-hd"><h1>✏️ Korrekturantrag stellen</h1></div>
+  <div class="form-card">
+    <div class="form-row"><label class="form-lbl">Datum</label><input type="date" id="c-dat" class="form-inp" value="${today()}"></div>
+    <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="c-kom" class="form-inp" value="08:00"></div>
+    <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="c-geh" class="form-inp" value="17:00"></div>
+    <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="c-pau" class="form-inp" value="45"></div>
+    <div class="form-row"><label class="form-lbl">Begründung</label><input type="text" id="c-beg" class="form-inp" placeholder="Warum Korrektur?"></div>
+    <button class="btn btn-primary" style="margin-top:10px" onclick="submitKorrektur()">Korrektur anfragen</button>
+  </div>`;
+}
+
+async function submitKorrektur(){
+  const datum=document.getElementById('c-dat').value, kommen=document.getElementById('c-kom').value,
+        gehen=document.getElementById('c-geh').value, pauseMin=+document.getElementById('c-pau').value||0,
+        kommentar=document.getElementById('c-beg').value;
+  if(!datum||!kommen||!gehen){alert('Bitte alle Zeiten ausfüllen.');return;}
+  const r=await api.post('antraege',{typ:'korrektur',datum,kommen,gehen,pauseMin,kommentar});
+  if(r.ok||r.id){ alert('Korrekturantrag eingereicht!'); nav('meine-antraege'); }
+  else alert('Fehler: '+r.error);
+}
+
+async function pgMeine(){
+  const list=await api.get(`antraege?userId=${CU.id}`);
+  const rows = (Array.isArray(list)?list:[]).map(a=>`
+    <tr>
+      <td>${a.typ==='urlaub'?'🏖️ Urlaub':a.typ==='krank'?'🏥 Krank':'✏️ Korrektur'}</td>
+      <td>${a.typ==='urlaub'?`${a.von} bis ${a.bis}`:a.typ==='korrektur'?`${a.datum} (${a.kommen}-${a.gehen})`:a.von}</td>
+      <td><span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-nb'}">${a.status}</span></td>
+      <td style="color:var(--text2)">${esc(a.kommentar||'—')}</td>
+    </tr>`).join('');
+
+  return `<div class="page-hd"><h1>📋 Meine Anträge</h1></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Typ</th><th>Details</th><th>Status</th><th>Kommentar</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4" style="color:var(--text3)">Keine Anträge vorhanden.</td></tr>'}</tbody>
+    </table>
+  </div>`;
+}
+
+// Start
 checkSetup();
 </script>
 </body>
