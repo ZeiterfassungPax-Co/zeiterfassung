@@ -310,7 +310,7 @@ function logout(){
 
 // ── Data Loading ──────────────────────────────────────────────────────────────
 async function loadUsers(){ allUsers=await api.get('users'); }
-async function loadPending(){ const a=await api.get('antraege'); pending=a.filter(x=>x.status==='offen').length; renderSidebar(); }
+async function loadPending(){ const a=await api.get(''); pending=a.filter(x=>x.status==='offen').length; renderSidebar(); }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 function renderSidebar(){
@@ -322,7 +322,7 @@ function renderSidebar(){
     <button ${sb('anwesenheit')}>👥 Anwesenheit</button>
     <button ${sb('kalender')}>📅 Kalender</button>
     <div class="sb-section">Verwaltung</div>
-    <button ${sb('antraege')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
+    <button ${sb('')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
     <button ${sb('mitarbeiter')}>👤 Mitarbeiter</button>
     <button ${sb('einstellungen')}>⚙️ Einstellungen</button>
     <div class="sb-section">Auswertung</div>
@@ -336,7 +336,7 @@ function renderSidebar(){
     <button ${sb('krank')}>🏥 Krankmeldung</button>
     <button ${sb('korrektur')}>✏️ Korrekturantrag</button>
     <div class="sb-section">Anträge</div>
-    <button ${sb('meine-antraege')}>📋 Meine Anträge</button>
+    <button ${sb('meine-')}>📋 Meine Anträge</button>
   `;
 }
 
@@ -352,7 +352,7 @@ async function render(){
     if(isAdmin){
       if(page==='anwesenheit')  el.innerHTML=await pgAnwesenheit();
       else if(page==='kalender')el.innerHTML=await pgKalender(adminSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id, true);
-      else if(page==='antraege')el.innerHTML=await pgAntraege();
+      else if(page==='')el.innerHTML=await pg();
       else if(page==='mitarbeiter')el.innerHTML=await pgMitarbeiter();
       else if(page==='einstellungen')el.innerHTML=await pgEinstellungen();
       else el.innerHTML=pgExport();
@@ -362,7 +362,7 @@ async function render(){
       else if(page==='urlaub')  el.innerHTML=await pgUrlaub();
       else if(page==='krank')   el.innerHTML=pgKrank();
       else if(page==='korrektur')el.innerHTML=pgKorrektur();
-      else if(page==='meine-antraege')el.innerHTML=await pgMeineAntraege();
+      else if(page==='meine-')el.innerHTML=await pgMeine();
     }
   }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${esc(e.message)}</div>`;}
   startClock();
@@ -547,7 +547,7 @@ async function buchen(typ){ await api.post('buchen',{userId:CU.id,typ}); render(
 
 // ── Urlaubsantrag (MA) ────────────────────────────────────────────────────────
 async function pgUrlaub(){
-  const[antraege,jd]=await Promise.all([api.get(`antraege?userId=${CU.id}&typ=urlaub`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
+  const[,jd]=await Promise.all([api.get(`?userId=${CU.id}&typ=urlaub`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
   const kn=jd.konten;
   return`<div class="page-hd"><h1>Urlaubsantrag</h1></div>
 <div class="alert alert-info">Resturlaub: <strong>${kn.urlaubRest} Tage</strong></div>
@@ -662,31 +662,67 @@ async function pgAnwesenheit(){
 
 // ── Admin: Anträge ────────────────────────────────────────────────────────────
 async function pgAntraege(){
-  const alle=await api.get('antraege');
-  const offen=alle.filter(a=>a.status==='offen'), entsch=alle.filter(a=>a.status!=='offen');
-  const urlaubRow=a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td><span class="pill pill-urlaub">Urlaub</span></td>
+  const alle = await api.get('antraege');
+  const offen = alle.filter(a => a.status === 'offen');
+  const entsch = alle.filter(a => a.status !== 'offen');
+
+  // helper für sichere ID-Ausgabe als String in HTML-Attributen
+  const getId = a => `'${a.aid || a.id}'`;
+
+  const urlaubRow = a => `<tr>
+    <td style="font-weight:500">${esc(a.userName || a.userId)}</td>
+    <td><span class="pill pill-urlaub">Urlaub</span></td>
     <td>${(a.von||'').split('-').reverse().join('.')} – ${(a.bis||'').split('-').reverse().join('.')} (${a.tage}d)</td>
     <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
-    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.id},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.id},'abgelehnt')">✕</button></td></tr>`;
-  const korrRow=a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td><span class="pill pill-nb">Korrektur</span></td>
+    <td style="display:flex;gap:5px">
+      <button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button>
+      <button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button>
+    </td>
+  </tr>`;
+
+  const korrRow = a => `<tr>
+    <td style="font-weight:500">${esc(a.userName || a.userId)}</td>
+    <td><span class="pill pill-nb">Korrektur</span></td>
     <td>${(a.datum||'').split('-').reverse().join('.')} ${a.kommen}–${a.gehen} (${a.pauseMin}min Pause)</td>
     <td style="color:var(--text2)">${esc(a.kommentar)||'—'}</td>
-    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.id},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.id},'abgelehnt')">✕</button></td></tr>`;
-  const entschRow=a=>`<tr><td>${esc(a.userName)}</td><td>${a.typ==='urlaub'?'Urlaub':'Korrektur'}</td>
+    <td style="display:flex;gap:5px">
+      <button class="btn btn-sm btn-success" onclick="entscheide(${getId(a)},'genehmigt')">✓</button>
+      <button class="btn btn-sm btn-danger" onclick="entscheide(${getId(a)},'abgelehnt')">✕</button>
+    </td>
+  </tr>`;
+
+  const entschRow = a => `<tr>
+    <td>${esc(a.userName || a.userId)}</td>
+    <td>${a.typ==='urlaub'?'Urlaub':'Korrektur'}</td>
     <td>${a.typ==='urlaub'?(a.von||'').split('-').reverse().join('.'):'('+((a.datum||'').split('-').reverse().join('.'))+')'}</td>
-    <td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td></tr>`;
-  return`<div class="page-hd"><h1>Anträge</h1></div>
-${offen.length?`<div class="alert alert-warn">⚠️ ${offen.length} offene Anträge</div>`:'<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
+    <td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td>
+  </tr>`;
+
+  return `<div class="page-hd"><h1>Anträge</h1></div>
+${offen.length ? `<div class="alert alert-warn">⚠️ ${offen.length} offene Anträge</div>` : '<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
 <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Offen (${offen.length})</div>
-${offen.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Details</th><th>Kommentar</th><th>Aktion</th></tr></thead>
-<tbody>${offen.map(a=>a.typ==='korrektur'?korrRow(a):urlaubRow(a)).join('')}</tbody></table></div>`:''}
+${offen.length ? `<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Details</th><th>Kommentar</th><th>Aktion</th></tr></thead>
+<tbody>${offen.map(a => a.typ === 'korrektur' ? korrRow(a) : urlaubRow(a)).join('')}</tbody></table></div>` : ''}
 <div class="sep"></div>
 <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Entschieden</div>
-${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Datum</th><th>Status</th></tr></thead>
-<tbody>${entsch.map(entschRow).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
+${entsch.length ? `<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Datum</th><th>Status</th></tr></thead>
+<tbody>${entsch.map(entschRow).join('')}</tbody></table></div>` : '<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
 }
 
-async function entscheide(id,status){ await api.patch(`antraege/${id}`,{status}); await loadPending(); render(); }
+async function entscheide(id, status) {
+  try {
+    const r = await api.patch(`antraege/${id}`, { status });
+    if (r.ok || r.status === 'success' || !r.error) {
+      await loadPending();
+      render();
+    } else {
+      alert('Fehler beim Speichern: ' + (r.error || 'Unbekannter Fehler'));
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Fehler bei der Verbindung zum Server.');
+  }
+}
 
 // ── Admin: Mitarbeiter ────────────────────────────────────────────────────────
 const TAGE_NAMEN=['So','Mo','Di','Mi','Do','Fr','Sa'];
