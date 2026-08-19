@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zeiterfassung</title>
+<title>Zeiterfassung & Abwesenheitsverwaltung</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -50,9 +50,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .stat-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
 .stat-val{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
 .stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
-.stat-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:6px}
-.stat-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
-.stat-bar-fill.over{background:var(--danger)}
 .pos{color:var(--success)}.neg{color:var(--danger)}
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -60,32 +57,8 @@ th{text-align:left;padding:7px 10px;font-size:11px;font-weight:600;color:var(--t
 td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
-.tbl-inp{width:100%;padding:3px 6px;font-size:12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit}
-.tbl-inp:hover{border-color:var(--border)}.tbl-inp:focus{outline:none;border-color:var(--accent);background:var(--surface)}
 .pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
-.pill-ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
-.pill-krank{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
-.pill-urlaub{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
-.pill-offen{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-.pill-fehler{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
-.pill-nb{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-.pill-feiertag{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
-.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:12px}
-.alert-info{background:var(--accent-bg);color:var(--accent-text);border:1px solid #bfdbfe}
-.alert-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
-.alert-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
-.alert-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
-.stamp-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-.clock-display{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px}
-.clock-date{font-size:12px;color:var(--text3);margin-top:4px}
-.stamp-btns{display:flex;gap:8px;flex-wrap:wrap}
-.s-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;font-size:13px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit}
-.s-ein{background:#16a34a;color:#fff}.s-ein:hover{background:#15803d}
-.s-aus{background:#dc2626;color:#fff}.s-aus:hover{background:#b91c1c}
-.s-pause{background:#d97706;color:#fff}.s-pause:hover{background:#b45309}
-.s-weiter{background:var(--accent);color:#fff}.s-weiter:hover{background:#1d4ed8}
-.dot-s{width:9px;height:9px;border-radius:50%;display:inline-block}
-.dot-green{background:#16a34a}.dot-red{background:#9ca3af}.dot-yellow{background:#d97706}
+
 .cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .cal-nav h2{font-size:16px;font-weight:600}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
@@ -98,93 +71,41 @@ tbody tr:hover{background:var(--surface2)}
 .cal-dn{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text2)}
 .cal-day.today .cal-dn{color:var(--accent)}
 .cal-tag{font-size:10px;font-weight:600;padding:2px 5px;border-radius:4px;display:inline-block;margin-bottom:2px}
-.cal-tag-normal{background:var(--success-bg);color:var(--success)}
-.cal-tag-aktiv{background:var(--accent-bg);color:var(--accent-text)}
-.cal-tag-krank{background:var(--danger-bg);color:var(--danger)}
-.cal-tag-urlaub{background:var(--purple-bg);color:var(--purple)}
-.cal-tag-fehler{background:var(--orange-bg);color:var(--orange)}
-.cal-tag-frei{background:var(--bg);color:var(--text3)}
-.cal-tag-feiertag{background:var(--teal-bg);color:var(--teal)}
-.cal-tag-offen{background:var(--surface2);color:var(--text3)}
 .cal-time{font-size:10px;color:var(--text3);line-height:1.4}
 .cal-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text2);margin-bottom:12px}
 .cal-legend span{display:flex;align-items:center;gap:4px}
 .leg-dot{width:10px;height:10px;border-radius:3px}
+
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--surface);border-radius:10px;padding:24px;width:440px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal{background:var(--surface);border-radius:10px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
 .modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
 .form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.form-lbl{font-size:13px;color:var(--text2);min-width:120px}
-.form-inp{flex:1;max-width:260px}
-.login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:340px;text-align:center}
-.login-box h2{font-size:18px;font-weight:600;margin-bottom:6px}
-.login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
-.login-field{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:10px}
-.login-field:focus{outline:none;border-color:var(--accent)}
-.login-btn{width:100%;padding:10px;font-size:14px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit;margin-top:4px}
-.login-btn:hover{background:#1d4ed8}
-.login-err{color:var(--danger);font-size:12px;margin-top:10px;min-height:18px;text-align:center}
+.form-lbl{font-size:13px;color:var(--text2);min-width:140px}
+.form-inp{flex:1;max-width:280px}
+
 .ma-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .ma-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
 .ma-chip.act{background:var(--accent);color:#fff;border-color:var(--accent)}
-.anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:16px}
-.anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
-.anw-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.anw-name{font-size:13px;font-weight:500}.anw-sub{font-size:11px;color:var(--text3)}
+
 .page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
 .page-hd h1{font-size:16px;font-weight:600}
 .sep{height:1px;background:var(--border);margin:16px 0}
-.day-checks{display:flex;gap:8px;flex-wrap:wrap}
-.day-check{display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer}
-.soll-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px}
-.soll-tag{text-align:center}
-.soll-tag label{font-size:11px;color:var(--text3);display:block;margin-bottom:3px}
-.soll-tag input{width:100%;text-align:center;padding:4px;font-size:12px}
-/* Journal Druck */
-@media print{
-  .sidebar,.topbar,.no-print{display:none!important}
-  .main{padding:0!important;overflow:visible!important}
-  body{background:#fff}
-  .cal-day{break-inside:avoid}
-  .journal-print-header{display:block!important}
-}
-.journal-print-header{display:none}
-.jour-sum{background:var(--surface2);font-weight:600}
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:12px}
+.alert-info{background:var(--accent-bg);color:var(--accent-text);border:1px solid #bfdbfe}
+
+.tag-custom{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600}
 </style>
 </head>
 <body>
 
-<div class="login-overlay" id="setup-screen" style="display:none">
-  <div class="login-box">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    <h2>Ersteinrichtung</h2><p>Admin-Passwort festlegen</p>
-    <input class="login-field" id="setup-pw" type="password" placeholder="Admin-Passwort" onkeydown="if(event.key==='Enter')document.getElementById('setup-pw2').focus()">
-    <input class="login-field" id="setup-pw2" type="password" placeholder="Passwort wiederholen" onkeydown="if(event.key==='Enter')doSetup()">
-    <button class="login-btn" style="background:var(--purple)" onclick="doSetup()">Passwort speichern</button>
-    <div class="login-err" id="setup-err"></div>
-  </div>
-</div>
-
-<div class="login-overlay" id="login-screen">
-  <div class="login-box">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <h2 id="login-title">Zeiterfassung</h2><p>Bitte anmelden</p>
-    <input class="login-field" id="login-user" type="text" placeholder="Benutzername" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
-    <input class="login-field" id="login-pw" type="password" placeholder="Passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Anmelden</button>
-    <div class="login-err" id="login-err"></div>
-  </div>
-</div>
-
-<div id="app" style="display:none">
+<div id="app">
   <div class="topbar">
-    <div class="logo">⏱ <span id="firma-name">Zeiterfassung</span></div>
+    <div class="logo">⏱ <span id="firma-name">Zeiterfassung Admin System</span></div>
     <div class="topbar-right">
       <span class="live-dot" title="Live"></span>
-      <span style="font-size:12px;color:var(--text3)" id="topbar-name"></span>
-      <button class="btn btn-sm" onclick="logout()">Abmelden</button>
+      <span style="font-size:12px;color:var(--text3)">Admin Benutzer</span>
+      <button class="btn btn-sm" onclick="alert('Abgemeldet')">Abmelden</button>
     </div>
   </div>
   <div class="body">
@@ -199,755 +120,362 @@ tbody tr:hover{background:var(--surface2)}
 
 <script>
 const pad=n=>String(n).padStart(2,'0');
-const fmtT=d=>pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-const fmtD=d=>pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
-const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
-const monat=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);};
-const monatName=mk=>{const[y,m]=mk.split('-');return['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][+m-1]+' '+y;};
-const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fmtH=h=>{if(h===null||h===undefined)return'—';const neg=h<0;h=Math.abs(h);const hi=Math.floor(h),mi=Math.round((h-hi)*60);return(neg?'-':'')+hi+'h '+pad(mi)+'m';};
-const TAGE=['So','Mo','Di','Mi','Do','Fr','Sa'];
-const BL_NAMEN={BB:'Brandenburg',BE:'Berlin',BW:'Baden-Württemberg',BY:'Bayern',HB:'Bremen',HE:'Hessen',HH:'Hamburg',MV:'Mecklenburg-Vorpommern',NI:'Niedersachsen',NW:'Nordrhein-Westfalen',RP:'Rheinland-Pfalz',SH:'Schleswig-Holstein',SL:'Saarland',SN:'Sachsen',ST:'Sachsen-Anhalt',TH:'Thüringen'};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-const api={
-  get:url=>fetch('/api/'+url).then(r=>r.json()),
-  post:(url,data)=>fetch('/api/'+url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  patch:(url,data)=>fetch('/api/'+url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()),
-  del:url=>fetch('/api/'+url,{method:'DELETE'}).then(r=>r.json()),
+// Global State
+let page = 'kalender';
+let calMonat = '2026-08';
+let adminSelMa = 'm1';
+
+// Dynamic Absence Types
+let abwesenheitstypen = [
+  { id: 'krank', name: 'Krankheit', emoji: '🏥', color: '#dc2626', bg: '#fef2f2', border: '#fecaca', isArbeitszeit: false, isPreset: true },
+  { id: 'urlaub', name: 'Urlaub', emoji: '🏖️', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe', isArbeitszeit: false, isPreset: true },
+  { id: 'geschaeftsreise', name: 'Geschäftsreise', emoji: '✈️', color: '#2563eb', bg: '#eff4ff', border: '#bfdbfe', isArbeitszeit: true, isPreset: true },
+  { id: 'elternzeit', name: 'Elternzeit', emoji: '👶', color: '#d97706', bg: '#fffbeb', border: '#fde68a', isArbeitszeit: false, isPreset: true },
+  { id: 'sonderurlaub', name: 'Sonderurlaub', emoji: '🎁', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa', isArbeitszeit: false, isPreset: true },
+  { id: 'homeoffice', name: 'Homeoffice', emoji: '🏠', color: '#0d9488', bg: '#f0fdfa', border: '#99f6e4', isArbeitszeit: true, isPreset: true }
+];
+
+// Employees
+const users = [
+  { id: 'm1', name: 'Max Mustermann', sollTag: 8 },
+  { id: 'm2', name: 'Anna Schmidt', sollTag: 8 },
+  { id: 'm3', name: 'Lukas Weber', sollTag: 7.5 }
+];
+
+// Calendar Entries Store
+let calendarEntries = {
+  'm1_2026-08-03': { type: 'homeoffice', kommentar: 'Mobiles Arbeiten', ein: '08:00', aus: '16:30', pauseMin: 30 },
+  'm1_2026-08-04': { type: 'geschaeftsreise', kommentar: 'Kundenbesuch Frankfurt', ein: '08:00', aus: '16:30', pauseMin: 30 },
+  'm1_2026-08-07': { type: 'krank', kommentar: 'AU vorgelegt' },
+  'm1_2026-08-14': { type: 'sonderurlaub', kommentar: 'Hochzeit' },
+  'm1_2026-08-17': { type: 'urlaub', kommentar: 'Sommerurlaub' }
 };
 
-let CU=null,page='kalender',allUsers=[],allFirmen=[],pending=0,clockInt=null,sse=null;
-let adminSelMa=null,calMonat=monat(),journalMonat=monat(),journalSelMa=null;
-
-function connectSSE(){
-  if(sse)sse.close();
-  sse=new EventSource('/api/events');
-  ['buchung','nachbuchung','loeschung'].forEach(e=>sse.addEventListener(e,()=>{if(['kalender','buchen','anwesenheit','journal'].includes(page))render();}));
-  ['antrag_neu','antrag_update'].forEach(e=>sse.addEventListener(e,()=>{loadPending();if(['antraege','kalender','journal'].includes(page))render();}));
-  sse.addEventListener('user_update',()=>loadUsers().then(()=>render()));
-  sse.onerror=()=>setTimeout(connectSSE,5000);
-}
-
-async function checkSetup(){
-  const r=await api.get('setup/needed');
-  if(r.needed){document.getElementById('login-screen').style.display='none';document.getElementById('setup-screen').style.display='flex';}
-}
-async function doSetup(){
-  const pw=document.getElementById('setup-pw').value,pw2=document.getElementById('setup-pw2').value;
-  const err=document.getElementById('setup-err');err.textContent='';
-  if(pw.length<4){err.textContent='Mind. 4 Zeichen.';return;}
-  if(pw!==pw2){err.textContent='Passwörter stimmen nicht überein.';return;}
-  const r=await api.post('setup',{password:pw});
-  if(r.ok){document.getElementById('setup-screen').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='admin';document.getElementById('login-pw').focus();}
-  else err.textContent=r.error||'Fehler.';
-}
-async function doLogin(){
-  const username=document.getElementById('login-user').value.trim(),password=document.getElementById('login-pw').value;
-  const err=document.getElementById('login-err');err.textContent='';
-  if(!username||!password){err.textContent='Bitte Benutzername und Passwort eingeben.';return;}
-  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-  const data=await r.json();
-  if(!r.ok){err.textContent=data.error||'Anmeldung fehlgeschlagen.';return;}
-  CU=data.user;
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  document.getElementById('topbar-name').textContent=CU.name+(CU.role==='admin'?' (Admin)':'');
-  document.getElementById('login-pw').value='';
-  calMonat=monat();journalMonat=monat();
-  page=CU.role==='admin'?'anwesenheit':'buchen';
-  adminSelMa=allUsers.filter(u=>u.role==='ma')[0]?.id||null;
-  journalSelMa=adminSelMa;
-  await loadPending();
-  const s=await api.get('settings');
-  document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';
-  document.getElementById('login-title').textContent=s.firmaName||'Zeiterfassung';
-  render();
-}
-function logout(){
-  CU=null;
-  document.getElementById('login-user').value='';document.getElementById('login-pw').value='';
-  document.getElementById('login-err').textContent='';
-  document.getElementById('app').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-}
-async function loadUsers(){allUsers=await api.get('users');allFirmen=await api.get('firmen');}
-async function loadPending(){const a=await api.get('antraege');pending=a.filter(x=>x.status==='offen').length;renderSidebar();}
+function nav(p){ page=p; render(); }
 
 function renderSidebar(){
-  if(!CU)return;
-  const isAdmin=CU.role==='admin',p=page;
-  const sb=id=>`class="sb-btn${p===id?' active':''}" onclick="nav('${id}')"`;
-  document.getElementById('sidebar').innerHTML=isAdmin?`
-    <div class="sb-section">Übersicht</div>
-    <button ${sb('anwesenheit')}>👥 Anwesenheit</button>
-    <button ${sb('kalender')}>📅 Kalender</button>
-    <button ${sb('journal')}>📋 Journal</button>
+  document.getElementById('sidebar').innerHTML = `
     <div class="sb-section">Verwaltung</div>
-    <button ${sb('antraege')}>📄 Anträge ${pending>0?`<span class="badge">${pending}</span>`:''}</button>
-    <button ${sb('mitarbeiter')}>👤 Mitarbeiter</button>
-    <button class="sb-btn${page==='firmen'?' active':''}" onclick="nav('firmen')">🏢 Firmen</button>
-    <button ${sb('einstellungen')}>⚙️ Einstellungen</button>
-    <div class="sb-section">Auswertung</div>
-    <button ${sb('export')}>📊 Export</button>
-  `:`
-    <div class="sb-section">Zeiterfassung</div>
-    <button ${sb('buchen')}>⏱️ Buchen</button>
-    <button ${sb('kalender')}>📅 Mein Kalender</button>
-    <button ${sb('journal')}>📋 Mein Journal</button>
-    <div class="sb-section">Abwesenheiten</div>
-    <button ${sb('urlaub')}>🏖️ Urlaubsantrag</button>
-    <button ${sb('krank')}>🏥 Krankmeldung</button>
-    <button ${sb('korrektur')}>✏️ Korrekturantrag</button>
-    <div class="sb-section">Anträge</div>
-    <button ${sb('meine-antraege')}>📋 Meine Anträge</button>
+    <button class="sb-btn ${page==='kalender'?'active':''}" onclick="nav('kalender')">📅 Kalender & Abwesenheit</button>
+    <button class="sb-btn ${page==='einstellungen'?'active':''}" onclick="nav('einstellungen')">⚙️ Abwesenheitstypen</button>
   `;
 }
-function nav(p){page=p;render();}
 
-async function render(){
+function render(){
   renderSidebar();
-  const el=document.getElementById('main');
-  el.innerHTML='<div style="padding:20px;color:var(--text3)">Lade…</div>';
-  try{
-    const isAdmin=CU?.role==='admin';
-    if(isAdmin){
-      if(page==='anwesenheit') el.innerHTML=await pgAnwesenheit();
-      else if(page==='kalender') el.innerHTML=await pgKalender(adminSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id,true);
-      else if(page==='journal')  el.innerHTML=await pgJournal(journalSelMa||allUsers.filter(u=>u.role==='ma')[0]?.id,true);
-      else if(page==='antraege') el.innerHTML=await pgAntraege();
-      else if(page==='mitarbeiter') el.innerHTML=await pgMitarbeiter();
-      else if(page==='firmen') el.innerHTML=await pgFirmen();
-      else if(page==='einstellungen') el.innerHTML=await pgEinstellungen();
-      else el.innerHTML=pgExport();
-    } else {
-      if(page==='buchen')       el.innerHTML=await pgBuchen();
-      else if(page==='kalender')el.innerHTML=await pgKalender(CU.id,false);
-      else if(page==='journal') el.innerHTML=await pgJournal(CU.id,false);
-      else if(page==='urlaub')  el.innerHTML=await pgUrlaub();
-      else if(page==='krank')   el.innerHTML=pgKrank();
-      else if(page==='korrektur')el.innerHTML=pgKorrektur();
-      else if(page==='meine-antraege')el.innerHTML=await pgMeineAntraege();
+  const el = document.getElementById('main');
+  if(page==='kalender') el.innerHTML = renderKalender();
+  else if(page==='einstellungen') el.innerHTML = renderEinstellungen();
+}
+
+// ── Kalender View ──
+function renderKalender(){
+  const user = users.find(u=>u.id===adminSelMa);
+  const [year, mon] = calMonat.split('-').map(Number);
+  const firstDow = (new Date(year, mon-1, 1).getDay() + 6) % 7;
+  const daysInMon = new Date(year, mon, 0).getDate();
+  
+  let cells = '';
+  let istStundenGesamt = 0;
+  let sollStundenGesamt = 0;
+  let abwesenheitenCount = {};
+
+  for(let i=0; i<firstDow; i++) cells += `<div class="cal-day empty"></div>`;
+  
+  for(let day=1; day<=daysInMon; day++){
+    const ds = `${calMonat}-${pad(day)}`;
+    const dateObj = new Date(year, mon-1, day);
+    const dow = dateObj.getDay();
+    const isWochenende = (dow === 0 || dow === 6);
+    
+    const entryKey = `${adminSelMa}_${ds}`;
+    const entry = calendarEntries[entryKey];
+    
+    let tagHtml = '';
+    let infoHtml = '';
+
+    if (!isWochenende) sollStundenGesamt += user.sollTag;
+
+    if (entry) {
+      const typeDef = abwesenheitstypen.find(t=>t.id===entry.type);
+      if (typeDef) {
+        tagHtml = `<span class="tag-custom" style="background:${typeDef.bg};color:${typeDef.color};border:1px solid ${typeDef.border}">${typeDef.emoji} ${esc(typeDef.name)}</span>`;
+        
+        abwesenheitenCount[typeDef.id] = (abwesenheitenCount[typeDef.id] || 0) + 1;
+
+        if (typeDef.isArbeitszeit) {
+          const ein = entry.ein || '08:00';
+          const aus = entry.aus || '16:30';
+          const pause = (entry.pauseMin || 30) / 60;
+          const [h1, m1] = ein.split(':').map(Number);
+          const [h2, m2] = aus.split(':').map(Number);
+          const netto = Math.max(0, (h2 + m2/60) - (h1 + m1/60) - pause);
+          
+          istStundenGesamt += netto;
+          infoHtml = `<div class="cal-time">${ein}–${aus}<br>${fmtH(netto)}</div>`;
+        }
+      }
+    } else if (!isWochenende) {
+      tagHtml = `<span class="tag-custom" style="background:var(--surface2);color:var(--text3)">Anwesend</span>`;
+      istStundenGesamt += user.sollTag;
+      infoHtml = `<div class="cal-time">08:00–16:30<br>8h 00m</div>`;
     }
-  }catch(e){el.innerHTML=`<div class="alert alert-danger">Fehler: ${esc(e.message)}</div>`;}
-  startClock();
-}
-function startClock(){
-  if(clockInt)clearInterval(clockInt);
-  const tick=()=>{const el=document.getElementById('live-clock');if(el)el.textContent=fmtT(new Date());};
-  tick();clockInt=setInterval(tick,1000);
-}
-function openModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-bg').style.display='flex';}
-function closeModal(){document.getElementById('modal-bg').style.display='none';}
 
-const tagConfig={
-  normal:{label:'Anwesend',cls:'cal-tag-normal'},
-  aktiv:{label:'Aktiv',cls:'cal-tag-aktiv'},
-  krank:{label:'Krank',cls:'cal-tag-krank'},
-  urlaub:{label:'Urlaub',cls:'cal-tag-urlaub'},
-  fehler:{label:'⚠ Fehler',cls:'cal-tag-fehler'},
-  frei:{label:'Frei',cls:'cal-tag-frei'},
-  feiertag:{label:'Feiertag',cls:'cal-tag-feiertag'},
-  offen:{label:'',cls:'cal-tag-offen'},
-};
-
-function prevMonat(mk){const[y,m]=mk.split('-').map(Number);const d=new Date(y,m-2,1);return d.getFullYear()+'-'+pad(d.getMonth()+1);}
-function nextMonat(mk){const[y,m]=mk.split('-').map(Number);const d=new Date(y,m,1);return d.getFullYear()+'-'+pad(d.getMonth()+1);}
-
-// ── Kalender ──────────────────────────────────────────────────────────────────
-async function pgKalender(userId,isAdmin){
-  const selId=userId||CU.id;
-  const mas=allUsers.filter(u=>u.role==='ma');
-  const d=await api.get(`journal/${selId}?monat=${calMonat}`);
-  const{tage,konten:kn}=d;
-  const tageByDate={};tage.forEach(t=>tageByDate[t.date]=t);
-  const[year,mon]=calMonat.split('-').map(Number);
-  const firstDow=(new Date(year,mon-1,1).getDay()+6)%7;
-  const daysInMon=new Date(year,mon,0).getDate();
-  const todayStr=today();
-  const user=allUsers.find(u=>u.id===selId);
-  let cells='';
-  for(let i=0;i<firstDow;i++)cells+=`<div class="cal-day empty"></div>`;
-  for(let day=1;day<=daysInMon;day++){
-    const ds=`${calMonat}-${pad(day)}`;
-    const t=tageByDate[ds];
-    const isT=ds===todayStr;
-    const cfg=t?(tagConfig[t.typ]||tagConfig.offen):tagConfig.offen;
-    const lbl=t?cfg.label:'';
-    let info='';
-    if(t&&t.typ==='normal'&&t.ein) info=`<div class="cal-time">${t.ein}–${t.aus||'?'}<br>${t.netto!==null?fmtH(t.netto):''}</div>`;
-    if(t&&t.typ==='aktiv'&&t.ein) info=`<div class="cal-time">${t.ein}–laufend</div>`;
-    if(t&&t.typ==='fehler') info=`<div class="cal-time" style="color:var(--orange)">${esc(t.kommentar)}</div>`;
-    if(t&&t.typ==='feiertag') info=`<div class="cal-time">${esc(t.kommentar)}</div>`;
-    cells+=`<div class="cal-day${isT?' today':''}" onclick="calTagClick('${ds}','${selId}',${isAdmin})">
-      <div class="cal-dn">${day}</div>
-      ${lbl?`<span class="cal-tag ${cfg.cls}">${lbl}</span>`:''}
-      ${info}
+    cells += `<div class="cal-day" onclick="openAbwesenheitModal('${ds}')">
+      <div class="cal-dn" style="${isWochenende?'color:var(--text3)':''}">${day}</div>
+      ${tagHtml}
+      ${infoHtml}
     </div>`;
   }
-  const chipHtml=isAdmin?`<div class="ma-chips">${mas.map(m=>`<div class="ma-chip${selId===m.id?' act':''}" onclick="adminSelMa='${m.id}';calMonat='${calMonat}';render()">${esc(m.name)}</div>`).join('')}</div>`:'';
-  const prevM=prevMonat(calMonat),nextM=nextMonat(calMonat);
-  return`<div class="page-hd"><h1>📅 ${isAdmin?(user?esc(user.name):'Kalender'):'Mein Kalender'}</h1></div>
-${chipHtml}
-<div class="cal-nav">
-  <button class="btn btn-sm" onclick="calMonat='${prevM}';render()">‹ ${monatName(prevM).split(' ')[0]}</button>
-  <h2>${monatName(calMonat)}</h2>
-  <button class="btn btn-sm" onclick="calMonat='${nextM}';render()">${monatName(nextM).split(' ')[0]} ›</button>
-  <button class="btn btn-sm" onclick="calMonat='${monat()}';render()">Heute</button>
-  <button class="btn btn-sm no-print" onclick="nav('journal')" style="margin-left:auto">📋 Journal</button>
-</div>
-<div class="cal-legend">
-  <span><span class="leg-dot" style="background:var(--success-bg);border:1px solid var(--success-border)"></span>Anwesend</span>
-  <span><span class="leg-dot" style="background:var(--purple-bg);border:1px solid var(--purple-border)"></span>Urlaub</span>
-  <span><span class="leg-dot" style="background:var(--danger-bg);border:1px solid var(--danger-border)"></span>Krank</span>
-  <span><span class="leg-dot" style="background:var(--orange-bg);border:1px solid var(--orange-border)"></span>Fehler</span>
-  <span><span class="leg-dot" style="background:var(--teal-bg);border:1px solid var(--teal-border)"></span>Feiertag</span>
-  <span><span class="leg-dot" style="background:var(--bg)"></span>Frei</span>
-</div>
-<div class="cal-grid">
-  <div class="cal-head">Mo</div><div class="cal-head">Di</div><div class="cal-head">Mi</div>
-  <div class="cal-head">Do</div><div class="cal-head">Fr</div><div class="cal-head">Sa</div><div class="cal-head">So</div>
-  ${cells}
-</div>
-<div class="sep"></div>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Istzeit</div><div class="stat-val" style="font-size:18px">${fmtH(kn.istH)}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Soll</div><div class="stat-val" style="font-size:18px">${fmtH(kn.soll)}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}" style="font-size:18px">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Übertrag</div><div class="stat-val" style="font-size:18px">${fmtH(kn.uebertragStunden)}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Krank</div><div class="stat-val" style="font-size:18px">${kn.krank}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Fehler</div><div class="stat-val ${kn.fehler>0?'neg':''}" style="font-size:18px">${kn.fehler}</div></div>
-  <div class="stat-card" style="min-width:110px"><div class="stat-lbl">Resturlaub</div><div class="stat-val" style="font-size:18px">${kn.urlaubRest}</div></div>
-</div>`;
-}
 
-// ── Kalender Tag anklicken ─────────────────────────────────────────────────────
-async function calTagClick(date,userId,isAdmin){
-  const d=await api.get(`journal/${userId}?monat=${date.slice(0,7)}`);
-  const tag=d.tage.find(t=>t.date===date);
-  const user=allUsers.find(u=>u.id===userId);
-  const ds=date.split('-').reverse().join('.');
-  const typ=tag?.typ||'offen';
-  if(!isAdmin){
-    openModal(`<h3>📅 ${ds}</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:8px">
-        ${typ==='normal'?`Kommen: ${tag.ein} · Gehen: ${tag.aus} · Netto: ${fmtH(tag.netto)}`:
-          typ==='krank'?'🏥 Kranktag':typ==='urlaub'?'🏖️ Urlaub':
-          typ==='feiertag'?'🎉 Feiertag: '+esc(tag.kommentar):
-          typ==='fehler'?'⚠️ '+esc(tag?.kommentar||'Fehler'):
-          typ==='aktiv'?'Eingestempelt seit '+tag.ein:'Kein Eintrag'}
-      </p>
-      <div class="modal-actions"><button class="btn" onclick="closeModal()">Schließen</button></div>`);
-    return;
-  }
-  openModal(`<h3>📅 ${ds} — ${esc(user?.name||'')}</h3>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Aktuell: <strong>${
-      typ==='normal'?`${tag.ein}–${tag.aus} (${fmtH(tag.netto)})`:
-      typ==='fehler'?'⚠️ '+esc(tag.kommentar||'Fehler'):
-      typ==='krank'?'Krank':typ==='urlaub'?'Urlaub':
-      typ==='feiertag'?'Feiertag: '+esc(tag.kommentar):
-      typ==='aktiv'?'Aktiv':'Kein Eintrag'}</strong></div>
-    <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="m-k" class="form-inp" value="${tag?.ein||'08:00'}"></div>
-    <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="m-g" class="form-inp" value="${tag?.aus||'17:00'}"></div>
-    <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="m-p" class="form-inp" value="${tag?.pauseMin||45}" min="0"></div>
-    <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="m-c" class="form-inp" value="${esc(tag?.kommentar||'')}"></div>
-    <div class="modal-actions">
-      <button class="btn btn-danger" onclick="adminLoeschTag('${userId}','${date}')">🗑 Löschen</button>
-      <button class="btn" onclick="closeModal()">Abbrechen</button>
-      <button class="btn btn-primary" onclick="adminNachbuchen('${userId}','${date}')">💾 Speichern</button>
-    </div>`);
-}
-async function adminNachbuchen(userId,date){
-  const k=document.getElementById('m-k').value,g=document.getElementById('m-g').value,
-        p=document.getElementById('m-p').value,c=document.getElementById('m-c').value;
-  if(!k||!g){alert('Kommen und Gehen sind Pflicht.');return;}
-  const r=await api.post('nachbuchen',{userId,datum:date,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c||'Nachbuchung Admin'});
-  if(r.ok){closeModal();render();}else alert('Fehler: '+r.error);
-}
-async function adminLoeschTag(userId,date){
-  if(!confirm('Alle Buchungen für diesen Tag löschen?'))return;
-  await api.del(`buchungen/${userId}/${date}`);closeModal();render();
-}
+  const maChips = users.map(u => 
+    `<div class="ma-chip ${adminSelMa===u.id?'act':''}" onclick="adminSelMa='${u.id}';render()">${esc(u.name)}</div>`
+  ).join('');
 
-// ── Journal ───────────────────────────────────────────────────────────────────
-async function pgJournal(userId,isAdmin){
-  const selId=userId||CU.id;
-  const mas=allUsers.filter(u=>u.role==='ma');
-  const user=allUsers.find(u=>u.id===selId);
-  const d=await api.get(`journal/${selId}?monat=${journalMonat}`);
-  const{tage,konten:kn}=d;
-  const prevM=prevMonat(journalMonat),nextM=nextMonat(journalMonat);
-  const wt=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const saldo = istStundenGesamt - sollStundenGesamt;
 
-  const chipHtml=isAdmin?`<div class="ma-chips">${mas.map(m=>`<div class="ma-chip${selId===m.id?' act':''}" onclick="journalSelMa='${m.id}';journalMonat='${journalMonat}';render()">${esc(m.name)}</div>`).join('')}</div>`:'';
-
-  const typBadge=t=>{
-    if(t.typ==='normal') return `<span class="pill pill-ok">Anwesend${t.nachbuchung?' *':''}</span>`;
-    if(t.typ==='aktiv')  return `<span class="pill" style="background:var(--accent-bg);color:var(--accent-text);border:1px solid #bfdbfe">Aktiv</span>`;
-    if(t.typ==='krank')  return `<span class="pill pill-krank">Krank</span>`;
-    if(t.typ==='urlaub') return `<span class="pill pill-urlaub">Urlaub</span>`;
-    if(t.typ==='fehler') return `<span class="pill pill-fehler">⚠ Fehler</span>`;
-    if(t.typ==='feiertag')return`<span class="pill pill-feiertag">Feiertag</span>`;
-    if(t.typ==='frei')   return `<span class="pill" style="background:var(--bg);color:var(--text3);border:1px solid var(--border)">Frei</span>`;
-    return '';
-  };
-
-  const arbeitsTage=tage.filter(t=>['normal','aktiv','fehler'].includes(t.typ));
-  const diff=kn.saldo;
-
-  const rows=tage.map(t=>{
-    const dow=wt[new Date(t.date+'T12:00:00').getDay()];
-    const isWE=dow==='Sa'||dow==='So';
-    const diffH=t.netto!==null&&t.sollH?(t.netto-t.sollH):null;
-    return`<tr style="${isWE||t.typ==='feiertag'?'background:var(--surface2);':t.typ==='fehler'?'background:var(--orange-bg);':''}">
-      <td style="font-weight:500;color:${isWE?'var(--text3)':'var(--text)'}">${t.date.split('-').reverse().join('.')}</td>
-      <td style="color:var(--text3)">${dow}</td>
-      <td>${typBadge(t)}</td>
-      <td>${t.ein||'—'}</td>
-      <td>${t.aus||'—'}</td>
-      <td>${t.pauseMin?t.pauseMin+'min':'—'}</td>
-      <td>${t.sollH?fmtH(t.sollH):'—'}</td>
-      <td style="font-weight:500">${t.netto!==null?fmtH(t.netto):'—'}</td>
-      <td class="${diffH!==null?(diffH>=0?'pos':'neg'):''}">${diffH!==null?(diffH>=0?'+':'')+fmtH(Math.abs(diffH)):'—'}</td>
-      <td style="color:var(--text3);font-size:12px">${esc(t.kommentar)||''}</td>
-    </tr>`;
-  }).join('');
-
-  return`<div class="page-hd">
-    <h1>📋 ${isAdmin?(user?esc(user.name)+' — ':''):''}Journal ${monatName(journalMonat)}</h1>
-    <button class="btn btn-sm no-print" onclick="window.print()">🖨️ Drucken</button>
-  </div>
-  <div class="journal-print-header" style="margin-bottom:16px">
-    <strong>${isAdmin?(user?esc(user.name):''):(CU?.name||'')}</strong> — ${monatName(journalMonat)}<br>
-    <span style="font-size:12px;color:var(--text3)">Gedruckt am ${fmtD(new Date())}</span>
-  </div>
-  ${chipHtml}
-  <div class="cal-nav no-print">
-    <button class="btn btn-sm" onclick="${isAdmin?`journalSelMa='${selId}';`:''}journalMonat='${prevM}';render()">‹ ${monatName(prevM).split(' ')[0]}</button>
-    <h2>${monatName(journalMonat)}</h2>
-    <button class="btn btn-sm" onclick="${isAdmin?`journalSelMa='${selId}';`:''}journalMonat='${nextM}';render()">${monatName(nextM).split(' ')[0]} ›</button>
-    <button class="btn btn-sm" onclick="${isAdmin?`journalSelMa='${selId}';`:''}journalMonat='${monat()}';render()">Heute</button>
-  </div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr>
-        <th>Datum</th><th>Tag</th><th>Status</th>
-        <th>Kommen</th><th>Gehen</th><th>Pause</th>
-        <th>Soll</th><th>Ist</th><th>Diff</th><th>Kommentar</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-      <tfoot>
-        <tr class="jour-sum">
-          <td colspan="6" style="font-weight:600">Summe ${monatName(journalMonat)}</td>
-          <td>${fmtH(kn.soll)}</td>
-          <td>${fmtH(kn.istH)}</td>
-          <td class="${diff>=0?'pos':'neg'}">${diff>=0?'+':''}${fmtH(Math.abs(diff))}</td>
-          <td></td>
-        </tr>
-        <tr style="font-size:12px;color:var(--text3)">
-          <td colspan="10">
-            Übertrag Vormonat: ${fmtH(kn.uebertragStunden)} &nbsp;|&nbsp;
-            Kranktage: ${kn.krank} &nbsp;|&nbsp;
-            Fehler: ${kn.fehler} &nbsp;|&nbsp;
-            Urlaub genommen: ${kn.urlaubGenommen} &nbsp;|&nbsp;
-            Resturlaub: ${kn.urlaubRest} Tage &nbsp;|&nbsp;
-            * = Nachbuchung
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>`;
-}
-
-// ── Buchen ────────────────────────────────────────────────────────────────────
-async function pgBuchen(){
-  const mk=monat();
-  const[st,jd]=await Promise.all([api.get(`users/${CU.id}/status`),api.get(`journal/${CU.id}?monat=${mk}`)]);
-  const kn=jd.konten,p=kn.soll?Math.min(100,Math.round(kn.istH/kn.soll*100)):0;
-  return`<div class="page-hd"><h1>Buchen — ${fmtD(new Date())}</h1></div>
-<div class="stamp-panel">
-  <div><div class="clock-display" id="live-clock">${fmtT(new Date())}</div><div class="clock-date">${fmtD(new Date())}</div></div>
-  <div class="stamp-btns">
-    ${st.status==='aus'?`<button class="s-btn s-ein" onclick="buchen('kommen')">▶ Kommen</button>`:''}
-    ${st.status==='ein'&&!st.inPause?`<button class="s-btn s-pause" onclick="buchen('pause_start')">⏸ Pause</button>`:''}
-    ${st.inPause?`<button class="s-btn s-weiter" onclick="buchen('pause_ende')">▶ Weiter</button>`:''}
-    ${st.status==='ein'?`<button class="s-btn s-aus" onclick="buchen('gehen')">■ Gehen</button>`:''}
-  </div>
-  <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500">
-    <span class="dot-s ${st.status==='ein'&&!st.inPause?'dot-green':st.inPause?'dot-yellow':'dot-red'}"></span>
-    ${st.status==='ein'&&!st.inPause?'Anwesend'+(st.seit?' seit '+st.seit:''):st.inPause?'Pause':'Nicht eingestempelt'}
-  </div>
-</div>
-<div class="stat-grid">
-  <div class="stat-card"><div class="stat-lbl">Istzeit (Monat)</div><div class="stat-val">${fmtH(kn.istH)}</div><div class="stat-bar"><div class="stat-bar-fill${p>100?' over':''}" style="width:${Math.min(p,100)}%"></div></div><div class="stat-sub">${p}% von ${fmtH(kn.soll)}</div></div>
-  <div class="stat-card"><div class="stat-lbl">Saldo</div><div class="stat-val ${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</div><div class="stat-sub">${kn.saldo>=0?'Guthaben':'Fehlzeit'}</div></div>
-  <div class="stat-card"><div class="stat-lbl">Resturlaub</div><div class="stat-val">${kn.urlaubRest}</div><div class="stat-sub">von ${CU.urlaub_anspruch} Tagen</div></div>
-  <div class="stat-card"><div class="stat-lbl">Kranktage</div><div class="stat-val ${kn.krank>0?'neg':''}">${kn.krank}</div><div class="stat-sub">diesen Monat</div></div>
-</div>`;
-}
-async function buchen(typ){await api.post('buchen',{userId:CU.id,typ});render();}
-
-// ── Urlaubsantrag ─────────────────────────────────────────────────────────────
-async function pgUrlaub(){
-  const[antraege,jd]=await Promise.all([api.get(`antraege?userId=${CU.id}&typ=urlaub`),api.get(`journal/${CU.id}?monat=${monat()}`)]);
-  const kn=jd.konten;
-  return`<div class="page-hd"><h1>Urlaubsantrag</h1></div>
-<div class="alert alert-info">Resturlaub: <strong>${kn.urlaubRest} Tage</strong></div>
-<div class="card"><div class="card-title">Neuen Antrag stellen</div>
-  <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="uv" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Bis (inkl.)</label><input type="date" id="ub" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="uk" class="form-inp" placeholder="z.B. Sommerurlaub"></div>
-  <button class="btn btn-primary" onclick="urlaubStellen()">📤 Antrag einreichen</button>
-  <div id="urlaub-msg" style="margin-top:8px"></div>
-</div>
-${antraege.length?`<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th><th>Kommentar</th></tr></thead>
-<tbody>${antraege.map(a=>`<tr><td>${(a.von||'').split('-').reverse().join('.')}</td><td>${(a.bis||'').split('-').reverse().join('.')}</td><td>${a.tage}</td>
-<td><span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span></td>
-<td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Noch keine Anträge.</p>'}`;
-}
-async function urlaubStellen(){
-  const von=document.getElementById('uv').value,bis=document.getElementById('ub').value,k=document.getElementById('uk').value;
-  const msg=document.getElementById('urlaub-msg');
-  if(!von||!bis){msg.innerHTML='<div class="alert alert-warn">Bitte Von und Bis ausfüllen.</div>';return;}
-  if(von>bis){msg.innerHTML='<div class="alert alert-warn">Von darf nicht nach Bis liegen.</div>';return;}
-  let tage=0;for(let d=new Date(von);d<=new Date(bis);d.setDate(d.getDate()+1)){const dw=d.getDay();if(dw&&dw<6)tage++;}
-  const r=await api.post('antraege',{userId:CU.id,typ:'urlaub',von,bis,tage,kommentar:k});
-  if(r.ok){msg.innerHTML='<div class="alert alert-success">✓ Antrag eingereicht.</div>';setTimeout(render,1500);}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-}
-
-// ── Krankmeldung ──────────────────────────────────────────────────────────────
-function pgKrank(){
-  return`<div class="page-hd"><h1>Krankmeldung</h1></div>
-<div class="card"><div class="card-title">Kranktag eintragen</div>
-  <div class="form-row"><label class="form-lbl">Von</label><input type="date" id="kd" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Bis (optional)</label><input type="date" id="kbd" class="form-inp"></div>
-  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kk" class="form-inp" placeholder="z.B. Erkältung"></div>
-  <button class="btn btn-primary" onclick="krankmelden()">🏥 Eintragen</button>
-  <div id="krank-msg" style="margin-top:8px"></div>
-</div>`;
-}
-async function krankmelden(){
-  const d=document.getElementById('kd').value,bis=document.getElementById('kbd').value||d,k=document.getElementById('kk').value;
-  const msg=document.getElementById('krank-msg');
-  if(!d){msg.innerHTML='<div class="alert alert-warn">Bitte Datum wählen.</div>';return;}
-  for(let cur=new Date(d);cur<=new Date(bis);cur.setDate(cur.getDate()+1))
-    await api.post('buchen',{userId:CU.id,typ:'krank',kommentar:k||'Krank'});
-  msg.innerHTML='<div class="alert alert-success">✓ Eingetragen.</div>';
-}
-
-// ── Korrekturantrag ───────────────────────────────────────────────────────────
-function pgKorrektur(){
-  return`<div class="page-hd"><h1>Korrekturantrag</h1></div>
-<div class="alert alert-info">Buchungsfehler? Stelle hier einen Korrekturantrag. Der Admin prüft und genehmigt ihn.</div>
-<div class="card"><div class="card-title">Korrektur beantragen</div>
-  <div class="form-row"><label class="form-lbl">Datum</label><input type="date" id="kor-d" class="form-inp" value="${today()}"></div>
-  <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="kor-k" class="form-inp" value="08:00"></div>
-  <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="kor-g" class="form-inp" value="17:00"></div>
-  <div class="form-row"><label class="form-lbl">Pause (min)</label><input type="number" id="kor-p" class="form-inp" value="45" min="0"></div>
-  <div class="form-row"><label class="form-lbl">Kommentar</label><input type="text" id="kor-c" class="form-inp" placeholder="z.B. Handy vergessen"></div>
-  <button class="btn btn-primary" onclick="korrekturStellen()">📤 Antrag einreichen</button>
-  <div id="kor-msg" style="margin-top:8px"></div>
-</div>`;
-}
-async function korrekturStellen(){
-  const datum=document.getElementById('kor-d').value,k=document.getElementById('kor-k').value,
-        g=document.getElementById('kor-g').value,p=document.getElementById('kor-p').value,
-        c=document.getElementById('kor-c').value,msg=document.getElementById('kor-msg');
-  if(!datum||!k||!g){msg.innerHTML='<div class="alert alert-warn">Datum, Kommen und Gehen sind Pflicht.</div>';return;}
-  if(k>=g){msg.innerHTML='<div class="alert alert-warn">Gehenzeit muss nach Kommenzeit liegen.</div>';return;}
-  const r=await api.post('antraege',{userId:CU.id,typ:'korrektur',datum,kommen:k,gehen:g,pauseMin:+p||0,kommentar:c});
-  if(r.ok)msg.innerHTML='<div class="alert alert-success">✓ Korrekturantrag eingereicht.</div>';
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-}
-
-// ── Meine Anträge ─────────────────────────────────────────────────────────────
-async function pgMeineAntraege(){
-  const alle=await api.get(`antraege?userId=${CU.id}`);
-  const urlaub=alle.filter(a=>a.typ==='urlaub'),korrekturen=alle.filter(a=>a.typ==='korrektur');
-  const sp=a=>`<span class="pill ${a.status==='genehmigt'?'pill-ok':a.status==='abgelehnt'?'pill-krank':'pill-offen'}">${a.status==='genehmigt'?'Genehmigt':a.status==='abgelehnt'?'Abgelehnt':'Offen'}</span>`;
-  return`<div class="page-hd"><h1>Meine Anträge</h1></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">🏖️ Urlaubsanträge</div>
-${urlaub.length?`<div class="tbl-wrap"><table><thead><tr><th>Von</th><th>Bis</th><th>Tage</th><th>Status</th><th>Kommentar</th></tr></thead>
-<tbody>${urlaub.map(a=>`<tr><td>${(a.von||'').split('-').reverse().join('.')}</td><td>${(a.bis||'').split('-').reverse().join('.')}</td><td>${a.tage}</td><td>${sp(a)}</td><td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px;margin-bottom:12px">Keine Urlaubsanträge.</p>'}
-<div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">✏️ Korrekturanträge</div>
-${korrekturen.length?`<div class="tbl-wrap"><table><thead><tr><th>Datum</th><th>Kommen</th><th>Gehen</th><th>Status</th><th>Kommentar</th></tr></thead>
-<tbody>${korrekturen.map(a=>`<tr><td>${(a.datum||'').split('-').reverse().join('.')}</td><td>${a.kommen||'—'}</td><td>${a.gehen||'—'}</td><td>${sp(a)}</td><td>${esc(a.kommentar)||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--text3);font-size:13px">Keine Korrekturanträge.</p>'}`;
-}
-
-// ── Admin: Anwesenheit ────────────────────────────────────────────────────────
-async function pgAnwesenheit(){
-  const firmaFilter=document.getElementById('anw-firma-filter')?.value||'';
-  const url='anwesenheit'+(firmaFilter?'?firma='+encodeURIComponent(firmaFilter):'');
-  const data=await api.get(url);
-  const firmenOpts=`<option value="">Alle Firmen</option>${allFirmen.map(f=>`<option value="${esc(f.fid)}" ${firmaFilter===f.fid?'selected':''}>${esc(f.name)}</option>`).join('')}`;
-  return`<div class="page-hd">
-    <h1>Anwesenheit — ${fmtD(new Date())}</h1>
-    <div style="display:flex;gap:8px;align-items:center">
-      ${allFirmen.length?`<select id="anw-firma-filter" onchange="render()" style="font-size:12px">${firmenOpts}</select>`:''}
-      ${pending>0?`<span class="pill pill-offen">${pending} offene Anträge</span>`:''}
+  return `
+    <div class="page-hd">
+      <h1>📅 Kalender & Abwesenheiten — ${esc(user.name)}</h1>
     </div>
-  </div>
-<div class="anw-grid">${data.map(u=>{
-  const c=u.status.status==='ein'&&!u.status.inPause?'#16a34a':u.status.inPause?'#d97706':'#9ca3af';
-  const lbl=u.status.status==='ein'&&!u.status.inPause?'Anwesend'+(u.status.seit?' seit '+u.status.seit:''):u.status.inPause?'Pause':'Abwesend';
-  const firma=allFirmen.find(f=>f.fid===u.firma);
-  return`<div class="anw-card"><div class="anw-dot" style="background:${c}"></div><div>
-    <div class="anw-name">${esc(u.name)}</div>
-    <div class="anw-sub">${lbl}${firma?` · ${esc(firma.name)}`:''}</div>
-  </div></div>`;
-}).join('')}</div>
-<div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Monatsübersicht — ${monatName(monat())}</div>
-<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Firma</th><th>Ist</th><th>Soll</th><th>Saldo</th><th>Übertrag</th><th>Fehler</th><th>Krank</th><th>Urlaub</th></tr></thead>
-<tbody>${data.map(u=>{const kn=u.konten;const firma=allFirmen.find(f=>f.fid===u.firma);return`<tr>
-  <td style="font-weight:500;cursor:pointer" onclick="adminSelMa='${u.id}';journalSelMa='${u.id}';calMonat='${monat()}';journalMonat='${monat()}';nav('kalender')">${esc(u.name)}</td>
-  <td style="color:var(--text2)">${firma?esc(firma.name):'—'}</td>
-  <td>${fmtH(kn.istH)}</td><td>${fmtH(kn.soll)}</td>
-  <td class="${kn.saldo>=0?'pos':'neg'}">${kn.saldo>=0?'+':''}${fmtH(Math.abs(kn.saldo))}</td>
-  <td>${fmtH(kn.uebertragStunden)}</td>
-  <td class="${kn.fehler>0?'neg':''}">${kn.fehler}</td>
-  <td>${kn.krank}</td>
-  <td>${kn.urlaubGenommen}/${u.urlaub_anspruch}</td>
-</tr>`;}).join('')}</tbody></table></div>`;
+    <div class="ma-chips">${maChips}</div>
+
+    <div class="cal-nav">
+      <h2>August 2026</h2>
+      <div style="margin-left:auto;font-size:12px;color:var(--text2)">Klicke auf einen Tag, um Abwesenheiten oder Zeiterfassung zu bearbeiten</div>
+    </div>
+
+    <div class="cal-legend">
+      ${abwesenheitstypen.map(t=>`
+        <span><span class="leg-dot" style="background:${t.bg};border:1px solid ${t.border}"></span>${t.emoji} ${esc(t.name)} ${t.isArbeitszeit?'<small>(Arbeitszeit)</small>':''}</span>
+      `).join('')}
+    </div>
+
+    <div class="cal-grid">
+      <div class="cal-head">Mo</div><div class="cal-head">Di</div><div class="cal-head">Mi</div>
+      <div class="cal-head">Do</div><div class="cal-head">Fr</div><div class="cal-head">Sa</div><div class="cal-head">So</div>
+      ${cells}
+    </div>
+
+    <div class="sep"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="stat-card" style="min-width:130px"><div class="stat-lbl">Ist-Arbeitszeit</div><div class="stat-val" style="font-size:18px">${fmtH(istStundenGesamt)}</div></div>
+      <div class="stat-card" style="min-width:130px"><div class="stat-lbl">Soll-Arbeitszeit</div><div class="stat-val" style="font-size:18px">${fmtH(sollStundenGesamt)}</div></div>
+      <div class="stat-card" style="min-width:130px"><div class="stat-lbl">Saldo</div><div class="stat-val ${saldo>=0?'pos':'neg'}" style="font-size:18px">${saldo>=0?'+':''}${fmtH(saldo)}</div></div>
+      ${abwesenheitstypen.map(t=>{
+        const cnt = abwesenheitenCount[t.id] || 0;
+        return cnt > 0 ? `<div class="stat-card" style="min-width:110px"><div class="stat-lbl">${t.emoji} ${esc(t.name)}</div><div class="stat-val" style="font-size:18px">${cnt} Tage</div></div>` : '';
+      }).join('')}
+    </div>
+  `;
 }
 
-// ── Admin: Anträge ────────────────────────────────────────────────────────────
-async function pgAntraege(){
-  const alle=await api.get('antraege');
-  const offen=alle.filter(a=>a.status==='offen'),entsch=alle.filter(a=>a.status!=='offen');
-  const urlaubRow=a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td><span class="pill pill-urlaub">Urlaub</span></td>
-    <td>${(a.von||'').split('-').reverse().join('.')} – ${(a.bis||'').split('-').reverse().join('.')} (${a.tage}d)</td>
-    <td>${esc(a.kommentar)||'—'}</td>
-    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.aid},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.aid},'abgelehnt')">✕</button></td></tr>`;
-  const korrRow=a=>`<tr><td style="font-weight:500">${esc(a.userName)}</td><td><span class="pill pill-nb">Korrektur</span></td>
-    <td>${(a.datum||'').split('-').reverse().join('.')} ${a.kommen}–${a.gehen} (${a.pauseMin}min Pause)</td>
-    <td>${esc(a.kommentar)||'—'}</td>
-    <td style="display:flex;gap:5px"><button class="btn btn-sm btn-success" onclick="entscheide(${a.aid},'genehmigt')">✓</button><button class="btn btn-sm btn-danger" onclick="entscheide(${a.aid},'abgelehnt')">✕</button></td></tr>`;
-  const entschRow=a=>`<tr><td>${esc(a.userName)}</td><td>${a.typ==='urlaub'?'Urlaub':'Korrektur'}</td>
-    <td>${a.typ==='urlaub'?(a.von||'').split('-').reverse().join('.'):((a.datum||'').split('-').reverse().join('.'))}</td>
-    <td><span class="pill ${a.status==='genehmigt'?'pill-ok':'pill-krank'}">${a.status==='genehmigt'?'Genehmigt':'Abgelehnt'}</span></td></tr>`;
-  return`<div class="page-hd"><h1>Anträge</h1></div>
-${offen.length?`<div class="alert alert-warn">⚠️ ${offen.length} offene Anträge</div>`:'<div class="alert alert-success">✓ Keine offenen Anträge.</div>'}
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Offen (${offen.length})</div>
-${offen.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Details</th><th>Kommentar</th><th>Aktion</th></tr></thead>
-<tbody>${offen.map(a=>a.typ==='korrektur'?korrRow(a):urlaubRow(a)).join('')}</tbody></table></div>`:''}
-<div class="sep"></div>
-<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Entschieden</div>
-${entsch.length?`<div class="tbl-wrap"><table><thead><tr><th>Mitarbeiter</th><th>Typ</th><th>Datum</th><th>Status</th></tr></thead>
-<tbody>${entsch.map(entschRow).join('')}</tbody></table></div>`:'<p style="font-size:13px;color:var(--text3)">Keine.</p>'}`;
-}
-async function entscheide(id,status){await api.patch(`antraege/${id}`,{status});await loadPending();render();}
+// ── Abwesenheit Modal ──
+function openAbwesenheitModal(dateStr){
+  const user = users.find(u=>u.id===adminSelMa);
+  const entryKey = `${adminSelMa}_${dateStr}`;
+  const entry = calendarEntries[entryKey] || {};
+  const currentType = entry.type || '';
 
-// ── Admin: Mitarbeiter ────────────────────────────────────────────────────────
-async function pgMitarbeiter(){
-  const mas=allUsers.filter(u=>u.role==='ma');
-  const firmenOpts=allFirmen.map(f=>`<option value="${esc(f.fid)}">${esc(f.name)}</option>`).join('');
+  const opts = abwesenheitstypen.map(t=>`
+    <option value="${t.id}" ${currentType===t.id?'selected':''}>${t.emoji} ${esc(t.name)} ${t.isArbeitszeit?'(Arbeitszeit)':''}</option>
+  `).join('');
 
-  const maRows=mas.map(u=>{
-    const spt=u.soll_pro_tag||{1:8,2:8,3:8,4:8,5:8};
-    const arbTageChecks=[1,2,3,4,5,6,0].map(d=>`<label class="day-check"><input type="checkbox" ${(u.arbeitstage||[1,2,3,4,5]).includes(d)?'checked':''} data-d="${d}" class="at-${u.id}"> ${TAGE[d]}</label>`).join('');
-    const sollInputs=[1,2,3,4,5,6,0].map(d=>`<div class="soll-tag"><label>${TAGE[d]}</label><input type="number" class="spt-${u.id}" data-d="${d}" value="${spt[d]||spt[String(d)]||0}" min="0" max="24" step="0.5" style="border:1px solid var(--border2)"></div>`).join('');
-    return`<tr>
-      <td style="font-weight:500">${esc(u.name)}<br><span style="font-size:11px;color:var(--text3)">@${esc(u.username)}</span></td>
-      <td><select id="firma-${u.id}" style="font-size:12px;width:100%"><option value="">—</option>${firmenOpts.replace(`value="${esc(u.firma)}"`,`value="${esc(u.firma)}" selected`)}</select></td>
-      <td><input type="number" id="ur-${u.id}" class="tbl-inp" style="width:55px;border:1px solid var(--border2)" value="${u.urlaub_anspruch}"></td>
-      <td><div class="day-checks" style="flex-wrap:wrap;gap:4px">${arbTageChecks}</div><div class="soll-grid" style="margin-top:8px">${sollInputs}</div></td>
-      <td><input type="password" id="pw-${u.id}" class="tbl-inp" style="width:100px;border:1px solid var(--border2)" placeholder="Neues PW"></td>
-      <td><button class="btn btn-sm btn-primary" onclick="updateUser('${u.id}')">💾</button></td>
-    </tr>`;
-  }).join('');
+  const typeDef = abwesenheitstypen.find(t=>t.id===(currentType || abwesenheitstypen[0].id));
+  const showTimes = typeDef ? typeDef.isArbeitszeit : false;
 
-  const monate=[];for(let i=0;i<12;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
+  openModal(`
+    <h3>📅 Abwesenheit eintragen — ${dateStr.split('-').reverse().join('.')}</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Mitarbeiter: <strong>${esc(user.name)}</strong></p>
+    
+    <div class="form-row">
+      <label class="form-lbl">Abwesenheits-Typ</label>
+      <select id="m-typ" class="form-inp" onchange="toggleModalTimes()">
+        <option value="">-- Keine Abwesenheit (Normal) --</option>
+        ${opts}
+      </select>
+    </div>
 
-  return`<div class="page-hd"><h1>Mitarbeiter</h1></div>
-<div class="tbl-wrap"><table>
-<thead><tr><th>Name / Login</th><th>Firma</th><th>Urlaub Tage</th><th>Arbeitstage & Soll-Stunden/Tag</th><th>Passwort</th><th></th></tr></thead>
-<tbody>${maRows}</tbody></table></div>
-<div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--accent)">
-  <div class="card-title">📊 Stundenkonto manuell anpassen</div>
-  <div class="form-row"><label class="form-lbl">Mitarbeiter</label><select id="ue-ma" class="form-inp">${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
-  <div class="form-row"><label class="form-lbl">Monat</label><select id="ue-mo" class="form-inp">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <div class="form-row"><label class="form-lbl">Stunden-Übertrag</label><input type="number" id="ue-h" class="form-inp" step="0.5" placeholder="z.B. -8 oder 5.5"></div>
-  <div class="form-row"><label class="form-lbl">Urlaub-Übertrag</label><input type="number" id="ue-u" class="form-inp" placeholder="z.B. 2"></div>
-  <button class="btn btn-primary" onclick="saveUebertrag()">💾 Übertrag speichern</button>
-  <div id="ue-msg" style="margin-top:8px"></div>
-</div>
-<div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--purple)">
-  <div class="card-title">🔑 Admin-Zugang</div>
-  <div class="form-row"><label class="form-lbl">Benutzername</label><input type="text" id="adm-un" class="form-inp" value="${esc(allUsers.find(u=>u.role==='admin')?.username||'admin')}"></div>
-  <div class="form-row"><label class="form-lbl">Neues Passwort</label><input type="password" id="adm-pw" class="form-inp" placeholder="Leer = unverändert"></div>
-  <button class="btn btn-primary" onclick="updateAdmin()">💾 Speichern</button>
-  <div id="adm-msg" style="margin-top:8px"></div>
-</div>
-<div class="sep"></div>
-<div class="card"><div class="card-title">➕ Neuen Mitarbeiter anlegen</div>
-  <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="neu-name" class="form-inp" placeholder="Max Mustermann"></div>
-  <div class="form-row"><label class="form-lbl">Benutzername</label><input type="text" id="neu-un" class="form-inp" placeholder="mmustermann"></div>
-  <div class="form-row"><label class="form-lbl">Passwort</label><input type="password" id="neu-pw" class="form-inp" placeholder="Mind. 4 Zeichen"></div>
-  <div class="form-row"><label class="form-lbl">ID</label><input type="text" id="neu-id" class="form-inp" placeholder="ma6"></div>
-  <div class="form-row"><label class="form-lbl">Firma</label><select id="neu-firma" class="form-inp"><option value="">—</option>${firmenOpts}</select></div>
-  <div class="form-row"><label class="form-lbl">Urlaub (Tage)</label><input type="number" id="neu-urlaub" class="form-inp" value="20"></div>
-  <button class="btn btn-primary" onclick="neuenMA()">+ Anlegen</button>
-  <div id="ma-msg" style="margin-top:8px"></div>
-</div>`;
+    <div id="modal-time-fields" style="display:${showTimes?'block':'none'}">
+      <div class="form-row"><label class="form-lbl">Kommen</label><input type="time" id="m-ein" class="form-inp" value="${entry.ein||'08:00'}"></div>
+      <div class="form-row"><label class="form-lbl">Gehen</label><input type="time" id="m-aus" class="form-inp" value="${entry.aus||'16:30'}"></div>
+      <div class="form-row"><label class="form-lbl">Pause (Min.)</label><input type="number" id="m-pause" class="form-inp" value="${entry.pauseMin||30}"></div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-lbl">Bemerkung</label>
+      <input type="text" id="m-kommentar" class="form-inp" placeholder="z. B. Nachweis liegt vor" value="${esc(entry.kommentar||'')}">
+    </div>
+
+    <div class="modal-actions">
+      ${currentType ? `<button class="btn btn-danger" onclick="deleteEntry('${dateStr}')">🗑 Entfernen</button>` : ''}
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveEntry('${dateStr}')">💾 Speichern</button>
+    </div>
+  `);
 }
 
-async function updateUser(id){
-  const urlaub=+document.getElementById('ur-'+id).value;
-  const pw=document.getElementById('pw-'+id).value;
-  const firma=document.getElementById('firma-'+id).value;
-  const arbBoxen=document.querySelectorAll('.at-'+id+':checked');
-  const arbeitstage=Array.from(arbBoxen).map(b=>+b.dataset.d);
-  const sptInputs=document.querySelectorAll('.spt-'+id);
-  const soll_pro_tag={};
-  sptInputs.forEach(inp=>{ soll_pro_tag[inp.dataset.d]=parseFloat(inp.value)||0; });
-  const body={urlaub_anspruch:urlaub,arbeitstage,soll_pro_tag,firma};
-  if(pw)body.password=pw;
-  const r=await api.patch('users/'+id,body);
-  if(r.ok){await loadUsers();alert('Gespeichert.');}else alert('Fehler: '+r.error);
-}
-async function updateAdmin(){
-  const un=document.getElementById('adm-un').value.trim(),pw=document.getElementById('adm-pw').value;
-  const msg=document.getElementById('adm-msg'),admin=allUsers.find(u=>u.role==='admin');
-  if(!admin)return;
-  const body={username:un};
-  if(pw){if(pw.length<4){msg.innerHTML='<div class="alert alert-warn">Mind. 4 Zeichen.</div>';return;}body.password=pw;}
-  const r=await api.patch('users/'+admin.id,body);
-  msg.innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
-  if(r.ok)await loadUsers();
-}
-async function saveUebertrag(){
-  const ma=document.getElementById('ue-ma').value,mo=document.getElementById('ue-mo').value;
-  const h=parseFloat(document.getElementById('ue-h').value)||0,u=parseInt(document.getElementById('ue-u').value)||0;
-  const msg=document.getElementById('ue-msg');
-  const r=await api.post(`uebertrag/${ma}/${mo}`,{stunden:h,urlaub:u});
-  msg.innerHTML=r.ok?'<div class="alert alert-success">✓ Übertrag gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';
-}
-async function neuenMA(){
-  const name=document.getElementById('neu-name').value.trim(),un=document.getElementById('neu-un').value.trim();
-  const pw=document.getElementById('neu-pw').value,id=document.getElementById('neu-id').value.trim();
-  const urlaub=+document.getElementById('neu-urlaub').value,firma=document.getElementById('neu-firma').value;
-  const msg=document.getElementById('ma-msg');
-  if(!name||!un||!id){msg.innerHTML='<div class="alert alert-warn">Name, Benutzername und ID sind Pflicht.</div>';return;}
-  if(!pw||pw.length<4){msg.innerHTML='<div class="alert alert-warn">Passwort mind. 4 Zeichen.</div>';return;}
-  const r=await api.post('users',{id,username:un,name,role:'ma',firma,urlaub_anspruch:urlaub,
-    arbeitstage:[1,2,3,4,5],soll_pro_tag:{1:8,2:8,3:8,4:8,5:8},password:pw});
-  if(r.ok){await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Mitarbeiter angelegt.</div>';}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+function toggleModalTimes(){
+  const typId = document.getElementById('m-typ').value;
+  const typeDef = abwesenheitstypen.find(t=>t.id===typId);
+  const container = document.getElementById('modal-time-fields');
+  if (container) {
+    container.style.display = (typeDef && typeDef.isArbeitszeit) ? 'block' : 'none';
+  }
 }
 
-// ── Admin: Firmen ─────────────────────────────────────────────────────────────
-async function pgFirmen(){
-  const firmen=await api.get('firmen');
-  return`<div class="page-hd"><h1>🏢 Firmen</h1></div>
-${firmen.length?`<div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Farbe</th><th>MAs</th><th></th></tr></thead>
-<tbody>${firmen.map(f=>{
-  const anzahl=allUsers.filter(u=>u.firma===f.fid).length;
-  return`<tr>
-    <td style="color:var(--text3);font-family:monospace">${esc(f.fid)}</td>
-    <td><input type="text" id="fn-${f.fid}" class="tbl-inp" style="border:1px solid var(--border2)" value="${esc(f.name)}"></td>
-    <td><input type="color" id="fc-${f.fid}" value="${f.farbe||'#2563eb'}" style="width:40px;height:28px;padding:2px;border:1px solid var(--border2);border-radius:4px;cursor:pointer"></td>
-    <td>${anzahl}</td>
-    <td style="display:flex;gap:5px">
-      <button class="btn btn-sm btn-primary" onclick="updateFirma('${f.fid}')">💾</button>
-      ${anzahl===0?`<button class="btn btn-sm btn-danger" onclick="deleteFirma('${f.fid}')">🗑</button>`:''}
-    </td>
-  </tr>`;
-}).join('')}</tbody></table></div>`:'<div class="alert alert-info">Noch keine Firmen angelegt.</div>'}
-<div class="sep"></div>
-<div class="card"><div class="card-title">➕ Neue Firma anlegen</div>
-  <div class="form-row"><label class="form-lbl">ID</label><input type="text" id="nf-id" class="form-inp" placeholder="firma1"></div>
-  <div class="form-row"><label class="form-lbl">Name</label><input type="text" id="nf-name" class="form-inp" placeholder="Musterfirma GmbH"></div>
-  <div class="form-row"><label class="form-lbl">Farbe</label><input type="color" id="nf-farbe" value="#2563eb" style="width:50px;height:32px;padding:2px;cursor:pointer"></div>
-  <button class="btn btn-primary" onclick="neueFirma()">+ Anlegen</button>
-  <div id="firma-msg" style="margin-top:8px"></div>
-</div>`;
-}
-async function updateFirma(fid){
-  const name=document.getElementById('fn-'+fid).value,farbe=document.getElementById('fc-'+fid).value;
-  const r=await api.patch('firmen/'+fid,{name,farbe});
-  if(r.ok){await loadUsers();alert('Gespeichert.');}else alert('Fehler: '+r.error);
-}
-async function deleteFirma(fid){
-  if(!confirm('Firma wirklich löschen?'))return;
-  const r=await api.del('firmen/'+fid);
-  if(r.ok){await loadUsers();render();}
-}
-async function neueFirma(){
-  const fid=document.getElementById('nf-id').value.trim(),name=document.getElementById('nf-name').value.trim(),farbe=document.getElementById('nf-farbe').value;
-  const msg=document.getElementById('firma-msg');
-  if(!fid||!name){msg.innerHTML='<div class="alert alert-warn">ID und Name sind Pflicht.</div>';return;}
-  const r=await api.post('firmen',{fid,name,farbe});
-  if(r.ok){await loadUsers();msg.innerHTML='<div class="alert alert-success">✓ Firma angelegt.</div>';setTimeout(render,800);}
-  else msg.innerHTML=`<div class="alert alert-danger">Fehler: ${r.error}</div>`;
+function saveEntry(dateStr){
+  const typId = document.getElementById('m-typ').value;
+  const entryKey = `${adminSelMa}_${dateStr}`;
+
+  if (!typId) {
+    delete calendarEntries[entryKey];
+  } else {
+    const typeDef = abwesenheitstypen.find(t=>t.id===typId);
+    calendarEntries[entryKey] = {
+      type: typId,
+      kommentar: document.getElementById('m-kommentar').value,
+      ein: typeDef.isArbeitszeit ? document.getElementById('m-ein').value : null,
+      aus: typeDef.isArbeitszeit ? document.getElementById('m-aus').value : null,
+      pauseMin: typeDef.isArbeitszeit ? +document.getElementById('m-pause').value : 0
+    };
+  }
+
+  closeModal();
+  render();
 }
 
-// ── Admin: Einstellungen ──────────────────────────────────────────────────────
-async function pgEinstellungen(){
-  const s=await api.get('settings');
-  const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
-  const blOpts=Object.entries(BL_NAMEN).map(([k,v])=>`<option value="${k}" ${s.bundesland===k?'selected':''}>${v}</option>`).join('');
-  return`<div class="page-hd"><h1>Einstellungen</h1></div>
-<div class="card"><div class="card-title">🏢 Allgemein</div>
-  <div class="form-row"><label class="form-lbl">Firmenname</label><input type="text" id="firma" class="form-inp" value="${esc(s.firmaName||'')}"></div>
-  <div class="form-row"><label class="form-lbl">Bundesland</label><select id="bl" class="form-inp">${blOpts}</select></div>
-  <div class="alert alert-info" style="margin-top:8px">Bundesland wird für die automatische Feiertagsberechnung verwendet.</div>
-</div>
-<div class="card"><div class="card-title">⏸ Pausenregelungen (gesetzlich)</div>
-  <div class="form-row"><label class="form-lbl">Ab 6h Arbeitszeit</label><input type="number" id="p6" class="form-inp" value="${s.pause6h||30}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
-  <div class="form-row"><label class="form-lbl">Ab 9h Arbeitszeit</label><input type="number" id="p9" class="form-inp" value="${s.pause9h||45}" style="max-width:80px"> <span style="font-size:13px;color:var(--text3)">Minuten</span></div>
-</div>
-<button class="btn btn-primary" onclick="saveSettings()">💾 Speichern</button>
-<div id="set-msg" style="margin-top:8px"></div>
-<div class="sep"></div>
-<div class="card" style="border-left:3px solid var(--danger)">
-  <div class="card-title">📅 Monatsabschluss</div>
-  <div class="alert alert-warn" style="margin-bottom:10px">⚠️ Der Saldo wird automatisch als Übertrag in den Folgemonat übernommen. Erst Export erstellen!</div>
-  <div class="form-row"><label class="form-lbl">Monat</label><select id="abschl-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <button class="btn btn-danger" onclick="monatsabschluss()">⚠️ Abschluss durchführen</button>
-  <div id="abschl-msg" style="margin-top:8px"></div>
-</div>`;
-}
-async function saveSettings(){
-  const r=await api.post('settings',{pause6h:+document.getElementById('p6').value,pause9h:+document.getElementById('p9').value,firmaName:document.getElementById('firma').value,bundesland:document.getElementById('bl').value});
-  document.getElementById('set-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Gespeichert.</div>':'<div class="alert alert-danger">Fehler.</div>';
-  if(r.ok){const s=await api.get('settings');document.getElementById('firma-name').textContent=s.firmaName||'Zeiterfassung';}
-}
-async function monatsabschluss(){
-  const mo=document.getElementById('abschl-mo').value;
-  if(!confirm(`Monatsabschluss für ${monatName(mo)} wirklich durchführen?\nDer Saldo wird als Übertrag übernommen.`))return;
-  const r=await api.post('monatsabschluss',{monat:mo});
-  document.getElementById('abschl-msg').innerHTML=r.ok?'<div class="alert alert-success">✓ Abschluss durchgeführt.</div>':'<div class="alert alert-danger">Fehler.</div>';
+function deleteEntry(dateStr){
+  delete calendarEntries[`${adminSelMa}_${dateStr}`];
+  closeModal();
+  render();
 }
 
-// ── Export ────────────────────────────────────────────────────────────────────
-function pgExport(){
-  const mas=allUsers.filter(u=>u.role==='ma');
-  const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
-  const firmenOpts=allFirmen.map(f=>`<option value="${esc(f.fid)}">${esc(f.name)}</option>`).join('');
-  return`<div class="page-hd"><h1>Export</h1></div>
-<div class="card"><div class="card-title">📊 Monatsbericht</div>
-  <div class="form-row"><label class="form-lbl">Monat</label><select id="exp-mo" class="form-inp" style="max-width:180px">${monate.map(m=>`<option value="${m}">${monatName(m)}</option>`).join('')}</select></div>
-  <div class="form-row"><label class="form-lbl">Mitarbeiter</label><select id="exp-ma" class="form-inp" style="max-width:220px"><option value="">Alle</option>${mas.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>
-  ${allFirmen.length?`<div class="form-row"><label class="form-lbl">Firma</label><select id="exp-firma" class="form-inp" style="max-width:220px"><option value="">Alle Firmen</option>${firmenOpts}</select></div>`:''}
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <button class="btn btn-primary" onclick="exportCSV()">📄 Als CSV exportieren</button>
-  </div>
-</div>`;
-}
-function exportCSV(){
-  const mo=document.getElementById('exp-mo').value,ma=document.getElementById('exp-ma').value;
-  const firma=document.getElementById('exp-firma')?.value||'';
-  window.open('/api/export/csv?monat='+mo+(ma?'&userId='+ma:'')+(firma?'&firma='+encodeURIComponent(firma):''),'_blank');
+// ── Einstellungen View ──
+function renderEinstellungen(){
+  return `
+    <div class="page-hd">
+      <h1>⚙️ Abwesenheitstypen verwalten</h1>
+      <button class="btn btn-primary" onclick="openAddTypeModal()">➕ Neuer Abwesenheitstyp</button>
+    </div>
+
+    <div class="alert alert-info">
+      Hier definieren Sie die Abwesenheitsarten für Ihr Unternehmen. Sie legen fest, ob ein Typ als gearbeitete Zeit (z. B. Geschäftsreise, Homeoffice) in das Stundenkonto einfließt oder als freigestellte Zeit gewertet wird.
+    </div>
+
+    <div class="card">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Emoji</th>
+              <th>Name</th>
+              <th>ID</th>
+              <th>Zählt als Arbeitszeit?</th>
+              <th>Farbe</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${abwesenheitstypen.map(t=>`
+              <tr>
+                <td style="font-size:18px">${t.emoji}</td>
+                <td><strong>${esc(t.name)}</strong></td>
+                <td><code>${esc(t.id)}</code></td>
+                <td>
+                  ${t.isArbeitszeit 
+                    ? '<span class="pill pill-ok">Ja (Arbeitszeit)</span>' 
+                    : '<span class="pill" style="background:var(--bg);color:var(--text2)">Nein (Keine Arbeitszeit)</span>'}
+                </td>
+                <td><span class="tag-custom" style="background:${t.bg};color:${t.color};border:1px solid ${t.border}">${t.emoji} ${esc(t.name)}</span></td>
+                <td>
+                  ${!t.isPreset 
+                    ? `<button class="btn btn-sm btn-danger" onclick="removeType('${t.id}')">Löschen</button>` 
+                    : '<span style="font-size:11px;color:var(--text3)">Standard</span>'}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-connectSSE();
-loadUsers();
-checkSetup();
+function openAddTypeModal(){
+  openModal(`
+    <h3>➕ Neuen Abwesenheitstyp anlegen</h3>
+    <div class="form-row">
+      <label class="form-lbl">ID (z. B. fortbildung)</label>
+      <input type="text" id="t-id" class="form-inp" placeholder="fortbildung">
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">Name</label>
+      <input type="text" id="t-name" class="form-inp" placeholder="Fortbildung / Seminar">
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">Emoji</label>
+      <input type="text" id="t-emoji" class="form-inp" value="🎓">
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">Zählt als Arbeitszeit</label>
+      <select id="t-arbeitszeit" class="form-inp">
+        <option value="true">Ja (wird mit Soll/Zeiterfassung verrechnet)</option>
+        <option value="false" selected>Nein (Keine Arbeitszeit)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">Farbe (Hex)</label>
+      <input type="color" id="t-color" class="form-inp" value="#2563eb" style="height:32px;padding:2px">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveNewType()">Anlegen</button>
+    </div>
+  `);
+}
+
+function saveNewType(){
+  const id = document.getElementById('t-id').value.trim().toLowerCase().replace(/\s+/g, '_');
+  const name = document.getElementById('t-name').value.trim();
+  const emoji = document.getElementById('t-emoji').value.trim() || '📌';
+  const isArbeitszeit = document.getElementById('t-arbeitszeit').value === 'true';
+  const color = document.getElementById('t-color').value;
+
+  if (!id || !name) { alert('Bitte ID und Namen eingeben.'); return; }
+  if (abwesenheitstypen.some(t=>t.id===id)) { alert('Eine Abwesenheitsart mit dieser ID existiert bereits.'); return; }
+
+  abwesenheitstypen.push({
+    id, name, emoji, color,
+    bg: color + '15',
+    border: color + '40',
+    isArbeitszeit,
+    isPreset: false
+  });
+
+  closeModal();
+  render();
+}
+
+function removeType(id){
+  if (!confirm('Diesen Abwesenheitstyp wirklich löschen?')) return;
+  abwesenheitstypen = abwesenheitstypen.filter(t=>t.id!==id);
+  render();
+}
+
+function openModal(html){
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-bg').style.display = 'flex';
+}
+function closeModal(){
+  document.getElementById('modal-bg').style.display = 'none';
+}
+
+// Initial render
+render();
 </script>
 </body>
 </html>
