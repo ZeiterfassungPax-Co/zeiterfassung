@@ -889,7 +889,7 @@ async function neueFirma(){
 async function pgEinstellungen(){
   const s=await api.get('settings');
   const monate=[];for(let i=0;i<6;i++){const d=new Date();d.setMonth(d.getMonth()-i);monate.push(d.getFullYear()+'-'+pad(d.getMonth()+1));}
-  const blOpts=Object.entries(BL_NAMEN).map(([k,v])`<option value="${k}" ${s.bundesland===k?'selected':''}>${v}</option>`).join('');
+  const blOpts=Object.entries(BL_NAMEN).map(([k,v])=>`<option value="${k}" ${s.bundesland===k?'selected':''}>${v}</option>`).join('');
   return`<div class="page-hd"><h1>Einstellungen</h1></div>
 <div class="card"><div class="card-title">🏢 Allgemein</div>
   <div class="form-row"><label class="form-lbl">Firmenname</label><input type="text" id="firma" class="form-inp" value="${esc(s.firmaName||'')}"></div>
