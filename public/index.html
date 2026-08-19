@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zeiterfassung</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fa;
   --border:#e2e4e7;--border2:#c8ccd2;
@@ -17,15 +17,19 @@
   --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
   --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
   --teal:#0d9488;--teal-bg:#f0fdfa;--teal-border:#99f6e4;
-  --radius:6px;--sidebar:210px
+  --radius:6px;--sidebar:210px;--topbar:48px;--navbar:56px
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
 #app{display:flex;flex-direction:column;height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:48px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:var(--topbar);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:100}
 .logo{font-size:15px;font-weight:600;color:var(--accent)}
-.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-right{display:flex;align-items:center;gap:8px}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Desktop Layout ── */
 .body{display:flex;flex:1;overflow:hidden}
 .sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);padding:8px 0;overflow-y:auto;flex-shrink:0}
 .main{flex:1;overflow-y:auto;padding:20px}
@@ -34,18 +38,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sb-btn:hover{background:var(--bg);color:var(--text)}
 .sb-btn.active{background:var(--accent-bg);color:var(--accent-text);font-weight:500}
 .badge{margin-left:auto;font-size:10px;background:var(--danger);color:#fff;padding:1px 5px;border-radius:8px;font-weight:600}
+
+/* ── Mobile Bottom Nav ── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.mobile-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.mobile-nav-inner::-webkit-scrollbar{display:none}
+.mnav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;border:none;background:none;cursor:pointer;color:var(--text3);font-size:10px;font-family:inherit;white-space:nowrap;min-width:64px;flex-shrink:0}
+.mnav-btn.active{color:var(--accent)}
+.mnav-btn span:first-child{font-size:20px;line-height:1}
+.mnav-badge{position:relative;display:inline-block}
+.mnav-badge::after{content:attr(data-count);position:absolute;top:-4px;right:-8px;background:var(--danger);color:#fff;font-size:9px;padding:1px 4px;border-radius:8px;font-weight:600;display:none}
+.mnav-badge[data-count]:not([data-count="0"])::after{display:block}
+
+/* ── Inputs ── */
 input[type=text],input[type=password],input[type=date],input[type=time],input[type=number],input[type=color],select{padding:6px 8px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit}
 input:focus,select:focus{outline:none;border-color:var(--accent)}
+
+/* ── Buttons ── */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn:hover{background:var(--bg)}
 .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-primary:hover{background:#1d4ed8}
 .btn-sm{padding:3px 8px;font-size:12px}
 .btn-success{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
 .btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+
+/* ── Cards ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
 .card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px}
+
+/* ── Stats ── */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-@media(max-width:700px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
 .stat-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
 .stat-val{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
@@ -54,7 +76,9 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .stat-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
 .stat-bar-fill.over{background:var(--danger)}
 .pos{color:var(--success)}.neg{color:var(--danger)}
-.tbl-wrap{overflow-x:auto}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:7px 10px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:2px solid var(--border);white-space:nowrap}
 td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
@@ -62,6 +86,8 @@ tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
 .tbl-inp{width:100%;padding:3px 6px;font-size:12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit}
 .tbl-inp:hover{border-color:var(--border)}.tbl-inp:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+
+/* ── Pills & Alerts ── */
 .pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500}
 .pill-ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
 .pill-krank{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
@@ -75,6 +101,8 @@ tbody tr:hover{background:var(--surface2)}
 .alert-success{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
 .alert-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
 .alert-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+
+/* ── Stempel ── */
 .stamp-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
 .clock-display{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px}
 .clock-date{font-size:12px;color:var(--text3);margin-top:4px}
@@ -86,6 +114,8 @@ tbody tr:hover{background:var(--surface2)}
 .s-weiter{background:var(--accent);color:#fff}.s-weiter:hover{background:#1d4ed8}
 .dot-s{width:9px;height:9px;border-radius:50%;display:inline-block}
 .dot-green{background:#16a34a}.dot-red{background:#9ca3af}.dot-yellow{background:#d97706}
+
+/* ── Kalender ── */
 .cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .cal-nav h2{font-size:16px;font-weight:600}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
@@ -110,48 +140,135 @@ tbody tr:hover{background:var(--surface2)}
 .cal-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text2);margin-bottom:12px}
 .cal-legend span{display:flex;align-items:center;gap:4px}
 .leg-dot{width:10px;height:10px;border-radius:3px}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--surface);border-radius:10px;padding:24px;width:440px;max-width:95vw;max-height:90vh;overflow-y:auto}
+
+/* ── Modal ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;padding:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
 .modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ── Formulare ── */
 .form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .form-lbl{font-size:13px;color:var(--text2);min-width:120px}
 .form-inp{flex:1;max-width:260px}
+
+/* ── Login ── */
 .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:340px;text-align:center}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:340px;max-width:92vw;text-align:center}
 .login-box h2{font-size:18px;font-weight:600;margin-bottom:6px}
 .login-box p{font-size:13px;color:var(--text2);margin-bottom:20px}
-.login-field{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:10px}
+.login-field{width:100%;padding:12px;font-size:16px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:10px}
 .login-field:focus{outline:none;border-color:var(--accent)}
-.login-btn{width:100%;padding:10px;font-size:14px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit;margin-top:4px}
+.login-btn{width:100%;padding:12px;font-size:16px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit;margin-top:4px}
 .login-btn:hover{background:#1d4ed8}
 .login-err{color:var(--danger);font-size:12px;margin-top:10px;min-height:18px;text-align:center}
+
+/* ── MA Chips ── */
 .ma-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.ma-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
+.ma-chip{padding:6px 14px;border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2)}
 .ma-chip.act{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── Anwesenheit ── */
 .anw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:16px}
 .anw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
 .anw-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .anw-name{font-size:13px;font-weight:500}.anw-sub{font-size:11px;color:var(--text3)}
+
+/* ── Page Header ── */
 .page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
 .page-hd h1{font-size:16px;font-weight:600}
 .sep{height:1px;background:var(--border);margin:16px 0}
+
+/* ── Arbeitstage ── */
 .day-checks{display:flex;gap:8px;flex-wrap:wrap}
 .day-check{display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer}
 .soll-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px}
 .soll-tag{text-align:center}
 .soll-tag label{font-size:11px;color:var(--text3);display:block;margin-bottom:3px}
 .soll-tag input{width:100%;text-align:center;padding:4px;font-size:12px}
-/* Journal Druck */
+
+/* ── Print ── */
 @media print{
-  .sidebar,.topbar,.no-print{display:none!important}
+  .sidebar,.topbar,.mobile-nav,.no-print{display:none!important}
   .main{padding:0!important;overflow:visible!important}
   body{background:#fff}
-  .cal-day{break-inside:avoid}
   .journal-print-header{display:block!important}
 }
 .journal-print-header{display:none}
 .jour-sum{background:var(--surface2);font-weight:600}
+
+/* ═══════════════════════════════════════════════
+   MOBILE — max-width: 640px
+   ═══════════════════════════════════════════════ */
+@media(max-width:640px){
+  /* Sidebar ausblenden, Bottom-Nav einblenden */
+  .sidebar{display:none}
+  .mobile-nav{display:block}
+  .main{padding:12px 12px calc(var(--navbar) + 12px + env(safe-area-inset-bottom))}
+
+  /* Modal als Bottom-Sheet */
+  .modal-bg{align-items:flex-end}
+  .modal{border-radius:16px 16px 0 0;max-height:88vh;width:100%;max-width:100%}
+
+  /* Stempel-Panel stapeln */
+  .stamp-panel{flex-direction:column;align-items:flex-start;gap:14px;padding:14px}
+  .clock-display{font-size:42px}
+  .s-btn{padding:14px 20px;font-size:15px;flex:1;justify-content:center}
+  .stamp-btns{width:100%}
+
+  /* Kalender kompakter */
+  .cal-day{min-height:52px;padding:4px}
+  .cal-dn{font-size:11px}
+  .cal-tag{font-size:9px;padding:1px 3px}
+  .cal-time{display:none}
+  .cal-legend{display:none}
+  .cal-nav{gap:8px}
+  .cal-nav h2{font-size:14px}
+
+  /* Stats 2-spaltig */
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .stat-val{font-size:18px}
+
+  /* Formulare full-width */
+  .form-row{flex-direction:column;align-items:flex-start;gap:4px}
+  .form-lbl{min-width:unset;font-weight:500}
+  .form-inp{max-width:100%;width:100%}
+  input[type=text],input[type=password],input[type=date],input[type=time],input[type=number],select{width:100%;padding:10px;font-size:16px}
+
+  /* Tabellen scrollen */
+  .tbl-wrap{margin:0 -12px;padding:0 12px}
+
+  /* Anwesenheits-Grid 1-spaltig */
+  .anw-grid{grid-template-columns:1fr 1fr}
+
+  /* MA-Chips scrollen */
+  .ma-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .ma-chip{flex-shrink:0}
+
+  /* Soll-Grid kleiner */
+  .soll-grid{grid-template-columns:repeat(7,1fr);gap:2px}
+  .soll-tag input{font-size:11px;padding:2px}
+
+  /* Page Header */
+  .page-hd h1{font-size:14px}
+
+  /* Modal-Actions Stack */
+  .modal-actions{flex-direction:column-reverse}
+  .modal-actions .btn{width:100%;justify-content:center;padding:12px}
+
+  /* Topbar kompakter */
+  .topbar{padding:0 12px}
+  .logo{font-size:14px}
+}
+
+/* Mittelgroße Tablets */
+@media(min-width:641px) and (max-width:900px){
+  :root{--sidebar:56px}
+  .sb-section{display:none}
+  .sb-btn{flex-direction:column;gap:2px;padding:10px 4px;font-size:9px;justify-content:center}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .main{padding:16px}
+}
 </style>
 </head>
 <body>
@@ -191,6 +308,7 @@ tbody tr:hover{background:var(--surface2)}
     <div class="sidebar" id="sidebar"></div>
     <div class="main" id="main"></div>
   </div>
+  <nav class="mobile-nav" id="mobile-nav"></nav>
 </div>
 
 <div class="modal-bg" id="modal-bg" style="display:none" onclick="if(event.target===this)closeModal()">
@@ -304,6 +422,28 @@ function renderSidebar(){
     <div class="sb-section">Anträge</div>
     <button ${sb('meine-antraege')}>📋 Meine Anträge</button>
   `;
+
+  // Mobile Bottom-Nav
+  const mnav=document.getElementById('mobile-nav');
+  if(!mnav)return;
+  if(isAdmin){
+    mnav.innerHTML=`<div class="mobile-nav-inner">
+      <button class="mnav-btn${p==='anwesenheit'?' active':''}" onclick="nav('anwesenheit')"><span>👥</span><span>Team</span></button>
+      <button class="mnav-btn${p==='kalender'?' active':''}" onclick="nav('kalender')"><span>📅</span><span>Kalender</span></button>
+      <button class="mnav-btn${p==='journal'?' active':''}" onclick="nav('journal')"><span>📋</span><span>Journal</span></button>
+      <button class="mnav-btn${p==='antraege'?' active':''}" onclick="nav('antraege')"><span class="mnav-badge" data-count="${pending}">📄</span><span>Anträge</span></button>
+      <button class="mnav-btn${p==='mitarbeiter'?' active':''}" onclick="nav('mitarbeiter')"><span>👤</span><span>MA</span></button>
+      <button class="mnav-btn${['firmen','abwesenheittypen','einstellungen','export'].includes(p)?' active':''}" onclick="nav('einstellungen')"><span>⚙️</span><span>Mehr</span></button>
+    </div>`;
+  } else {
+    mnav.innerHTML=`<div class="mobile-nav-inner">
+      <button class="mnav-btn${p==='buchen'?' active':''}" onclick="nav('buchen')"><span>⏱️</span><span>Buchen</span></button>
+      <button class="mnav-btn${p==='kalender'?' active':''}" onclick="nav('kalender')"><span>📅</span><span>Kalender</span></button>
+      <button class="mnav-btn${p==='journal'?' active':''}" onclick="nav('journal')"><span>📋</span><span>Journal</span></button>
+      <button class="mnav-btn${p==='urlaub'?' active':''}" onclick="nav('urlaub')"><span>🏖️</span><span>Urlaub</span></button>
+      <button class="mnav-btn${['krank','korrektur','meine-antraege'].includes(p)?' active':''}" onclick="nav('meine-antraege')"><span>📋</span><span>Anträge</span></button>
+    </div>`;
+  }
 }
 function nav(p){page=p;render();}
 
